@@ -24,6 +24,8 @@ Before creating any implementation plan, read and understand the project guideli
 - Never suggest SQLite for any purpose
 - Include comprehensive test requirements in success criteria
 - Plan for manual testing documentation to be created after implementation
+- If the plan includes **API/backend modifications**, include a step to create an API E2E testing guide (after implementation) using the `e2e-test-guide-creator` agent
+- If the plan includes **frontend modifications**, include a step to create a frontend E2E testing guide (after implementation) for the `angular-tester` agent
 
 **IMPORTANT**: If the plan contradicts these guidelines, STOP and revise it before presenting to the user.
 

@@ -135,18 +135,81 @@ When implementing features or making changes:
 
 ## Manual Testing Documentation (MANDATORY)
 
-### When to Create
-**After completing any implementation**, a manual testing guide MUST be created.
+### Testing Guide Strategy
 
-### Location
-`thoughts/shared/testing/YYYY-MM-DD-ENG-XXXX-manual-test-guide.md`
+After completing any implementation, create appropriate testing guides based on what was changed:
+
+#### 1. API/Backend Changes: E2E API Test Guide
+
+**When to Create**: Any implementation that adds or modifies API endpoints, backend logic, or database structure.
+
+**How to Create**: Use the `e2e-test-guide-creator` agent (invoked as a Task during implementation):
+- The agent will research the codebase, locate database seeders, analyze endpoints, and generate comprehensive API test guides
+- It produces ready-to-run curl commands, seeded data IDs, SQL queries, and docker exec commands
+- This maximizes QA tester efficiency by eliminating manual lookup work
+
+**Location**: `thoughts/shared/e2e-test-guides/YYYY-MM-DD-[feature]-api-test-guide.md`
+
+**Agent-Generated Content Includes**:
+- Complete curl commands with headers and JSON bodies
+- Seeded user/entity IDs from database seeders
+- Authentication token retrieval steps with full API calls
+- SQL verification queries using docker exec
+- Entity creation steps when seeded data insufficient
+- Edge case testing (validation errors, authorization failures)
+- Docker commands for all backend/database operations
+
+**Example**:
+```markdown
+# E2E API Test Guide: Medical Annotations
+
+## Prerequisites
+- [ ] Docker containers running: `docker ps`
+- [ ] Backend: `docker exec pre-clinic-backend-app-1 php artisan migrate`
+- [ ] Seeded: `docker exec pre-clinic-backend-app-1 php artisan db:seed`
+
+## Authentication Setup
+```bash
+curl -X POST http://localhost:8000/api/v1/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "doctor@example.com", "password": "password123"}'
+```
+
+**Seeded Users**: Doctor (ID: 1), Manager (ID: 2)
+
+## Test Scenarios
+
+### Scenario 1: Create Annotation
+```bash
+curl -X POST http://localhost:8000/api/v1/medical-history/entries/10/annotations \
+  -H "Authorization: Bearer $AUTH_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"content": "Patient shows improvement"}'
+```
+
+**Expected Response** (200 OK):
+```json
+{"id": 45, "content": "Patient shows improvement", "created_by": 1}
+```
+
+**Verify in Database**:
+```bash
+docker exec pre-clinic-mysql-1 mysql -u root -ppassword clinic_db -e \
+  "SELECT * FROM annotations WHERE id = 45;"
+```
+```
+
+#### 2. General/UI Features: Manual Test Guide
+
+**When to Create**: For features requiring manual verification, complex workflows, or visual testing.
+
+**Location**: `thoughts/shared/testing/YYYY-MM-DD-ENG-XXXX-manual-test-guide.md`
 - Format: `YYYY-MM-DD-ENG-XXXX-manual-test-guide.md` where:
   - YYYY-MM-DD is the completion date
   - ENG-XXXX is the ticket number (omit if no ticket)
   - Example: `2025-12-28-ENG-1234-manual-test-guide.md`
 
-### Required Content
-The manual testing guide must include:
+**Required Content**:
 1. **Changes Summary**: What was implemented
 2. **Prerequisites**: Environment setup needed (Docker running, database seeded, etc.)
 3. **Test Scenarios**: Step-by-step instructions for each feature/change

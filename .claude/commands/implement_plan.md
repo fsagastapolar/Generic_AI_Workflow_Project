@@ -78,9 +78,64 @@ do not check off items in the manual testing steps until confirmed by the user.
 
 ## Manual Testing Documentation (MANDATORY)
 
-After completing ALL phases and ALL automated verification passes, you MUST create a manual testing guide before marking the implementation as complete.
+After completing ALL phases and ALL automated verification passes, you MUST create appropriate testing guides before marking the implementation as complete.
 
-### Create Testing Guide
+### Testing Guide Strategy
+
+Based on what was implemented, create the appropriate testing guides:
+
+#### For API/Backend Changes: Create E2E API Test Guide
+
+If the implementation includes **API endpoints, backend logic, or database changes**, invoke the `e2e-test-guide-creator` agent:
+
+1. **Invoke e2e-test-guide-creator as a Task**:
+   ```
+   Use the Task tool with:
+   - subagent_type: "e2e-test-guide-creator"
+   - description: "Generate comprehensive API E2E test guide"
+   - prompt: "Create a comprehensive E2E API test guide for the implementation in [PR/branch name]. 
+     
+     Context:
+     - Implementation: [Brief summary of what was implemented]
+     - API endpoints modified/added: [List endpoints]
+     - Files changed: [Key files from the diff]
+     - Database changes: [Migrations, seeders]
+     
+     Generate a complete test guide at thoughts/shared/e2e-test-guides/YYYY-MM-DD-[feature]-api-test-guide.md with:
+     - Ready-to-run curl commands with full headers and JSON bodies
+     - Seeded data IDs from database seeders (users, entities)
+     - Authentication token retrieval steps
+     - SQL verification queries using docker exec
+     - Entity creation steps when seeded data insufficient
+     - All docker exec commands for backend/database operations
+     - Edge case testing (validation errors, authorization failures)
+     
+     Make it copy-paste ready to minimize QA tester effort."
+   ```
+
+2. **Wait for the agent to generate the guide** - it will research the codebase, locate seeders, analyze endpoints, and create a comprehensive guide
+
+3. **Review and present**:
+   ```
+   API E2E Test Guide Created
+   
+   The e2e-test-guide-creator agent has generated a comprehensive API test guide at:
+   `thoughts/shared/e2e-test-guides/YYYY-MM-DD-[feature]-api-test-guide.md`
+   
+   The guide includes:
+   - Ready-to-run curl commands for all endpoints
+   - Seeded user/entity IDs from DatabaseSeeder
+   - Authentication setup with complete steps
+   - SQL verification queries
+   - Docker exec commands for all operations
+   - Edge case scenarios
+   
+   Please use this guide to verify the API functionality.
+   ```
+
+#### For Manual UI/General Testing: Create Manual Test Guide
+
+For features requiring manual verification (UI interactions, visual testing, or general workflows):
 
 1. **Create the file**: `thoughts/shared/testing/YYYY-MM-DD-ENG-XXXX-manual-test-guide.md`
    - Use today's date
@@ -109,7 +164,19 @@ After completing ALL phases and ALL automated verification passes, you MUST crea
    Let me know if you find any issues during testing.
    ```
 
-**IMPORTANT**: Do not mark the implementation as fully complete until the manual testing guide is created and presented to the user.
+**Decision Matrix - Which Guide(s) to Create:**
+
+| Implementation Type | Create API E2E Guide | Create Manual Guide | Create Frontend E2E Guide |
+|---------------------|----------------------|---------------------|---------------------------|
+| Backend API only | ✅ Yes (invoke e2e-test-guide-creator) | Optional (if complex workflows) | ❌ No |
+| Frontend only | ❌ No | Optional | ✅ Yes (for angular-tester) |
+| Full-stack (API + UI) | ✅ Yes (invoke e2e-test-guide-creator) | Optional | ✅ Yes (for angular-tester) |
+| Database/infra only | ❌ No | ✅ Yes | ❌ No |
+
+**IMPORTANT**: 
+- For API changes, ALWAYS use the `e2e-test-guide-creator` agent (via Task tool) - do not write API test guides manually
+- The agent will research seeders, analyze endpoints, and generate complete curl commands
+- Do not mark implementation complete until appropriate testing guide(s) are created
 
 ## Frontend E2E Testing with angular-tester (CONDITIONAL)
 

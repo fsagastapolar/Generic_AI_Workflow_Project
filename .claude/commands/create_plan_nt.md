@@ -24,7 +24,15 @@ Before creating any implementation plan, read and understand the project guideli
 - Never suggest SQLite for any purpose
 - Include comprehensive test requirements in success criteria
 - Plan for manual testing documentation to be created after implementation, the output format should be a md file to be stored in the thoughts/shared/testing directory
-- If the plan includes frontend modifications, include a step to create an E2E testing guide (after implementation) to be stored in `thoughts/shared/e2e-test-guides/` directory. The guide should:
+- If the plan includes **API/backend modifications**, include a step to create an API E2E testing guide (after implementation) using the `e2e-test-guide-creator` agent. The guide will be stored in `thoughts/shared/e2e-test-guides/` and should include:
+  - Ready-to-run curl commands with complete headers and JSON bodies
+  - Seeded data IDs from database seeders (users, entities, etc.)
+  - Authentication token retrieval steps with full API calls
+  - SQL verification queries using docker exec commands
+  - Entity creation steps when seeded data is insufficient
+  - Edge case testing scenarios (validation errors, authorization failures)
+  - **Note**: During implementation, the `e2e-test-guide-creator` agent will be invoked as a Task to generate these comprehensive API test guides
+- If the plan includes **frontend modifications**, include a step to create a frontend E2E testing guide (after implementation) for the `angular-tester` agent. The guide should:
   - Document specific user flows and test scenarios for the `angular-tester` agent to execute
   - List all `data-testid` attributes that must be added to components for reliable test selection (highest priority selector)
   - Include setup prerequisites (target URLs, test data, mock credentials if applicable)

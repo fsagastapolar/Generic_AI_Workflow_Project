@@ -6,6 +6,19 @@ description: Generate comprehensive PR descriptions following repository templat
 
 You are tasked with generating a comprehensive pull request description following the repository's standard template.
 
+## Prerequisites
+
+Before using this command, ensure you have the correct GitHub CLI version:
+- **Minimum Version**: 2.82.1 or higher
+- **Must use**: GitHub's official repository (not Ubuntu universe)
+- See `.claude/project_guidelines.md` → "GitHub CLI Requirements" for installation instructions
+
+Verify your setup:
+```bash
+gh --version  # Should be >= 2.82.1
+apt-cache policy gh | grep "cli.github.com"  # Should show GitHub's official repo
+```
+
 ## DO NOT
 
 - DO NOT run any kind of test. You'll assume all the proper testing was already done. You are NOT a tester

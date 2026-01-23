@@ -61,6 +61,49 @@ When running commands inside Docker containers, use these service names:
 
 Never commit directly to `develop` or `main`.
 
+## GitHub CLI Requirements (MANDATORY)
+
+### Official GitHub Repository Only
+- **MUST** use GitHub's official APT repository for gh CLI
+- **NEVER** use Ubuntu universe package (versions are outdated and broken)
+- **Minimum Version**: 2.82.1 or higher
+
+### Why Official Repository?
+- Ubuntu's gh package is broken due to GitHub's Projects (classic) API deprecation
+- Official repository stays synchronized with GitHub API changes
+- Automatic security updates from GitHub CLI maintainers
+
+### Installation/Upgrade Commands
+```bash
+# Add GitHub's official repository (one-time setup)
+(type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) \
+	&& sudo mkdir -p -m 755 /etc/apt/keyrings \
+	&& wget -nv -O /tmp/githubcli-keyring.gpg https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+	&& sudo mv /tmp/githubcli-keyring.gpg /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+	&& sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+	&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+	&& sudo apt update \
+	&& sudo apt install gh -y
+
+# Upgrade to latest version
+sudo apt update && sudo apt install gh
+```
+
+### Verification
+```bash
+# Check version (should be >= 2.82.1)
+gh --version
+
+# Verify source is GitHub's official repo
+apt-cache policy gh | grep "cli.github.com"
+```
+
+### Troubleshooting
+If you encounter `GraphQL: Projects (classic) is being deprecated` errors:
+1. Check your gh version: `gh --version`
+2. If version < 2.82.1, follow installation commands above
+3. Verify you're using GitHub's official repository, not Ubuntu universe
+
 ## Technical Best Practices
 
 ### MySQL Database Constraints
@@ -132,6 +175,7 @@ When implementing features or making changes:
 4. ✅ Use proper MySQL constraint naming
 5. ✅ Update all related Eloquent models when changing relationships
 6. ✅ Never modify tests to hide bugs - fix the code instead
+7. ✅ Use GitHub's official gh CLI repository (not Ubuntu universe)
 
 ## Manual Testing Documentation (MANDATORY)
 

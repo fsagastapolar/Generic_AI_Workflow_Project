@@ -23,7 +23,14 @@ Before creating any implementation plan, read and understand the project guideli
 - Specify Docker commands for backend operations (using `app` or `mysql` services)
 - Never suggest SQLite for any purpose
 - Include comprehensive test requirements in success criteria
-- Plan for manual testing documentation to be created after implementation
+- Plan for manual testing documentation to be created after implementation, the output format should be a md file to be stored in the thoughts/shared/testing directory
+- If the plan includes frontend modifications, include a step to create an E2E testing guide (after implementation) to be stored in `thoughts/shared/e2e-test-guides/` directory. The guide should:
+  - Document specific user flows and test scenarios for the `angular-tester` agent to execute
+  - List all `data-testid` attributes that must be added to components for reliable test selection (highest priority selector)
+  - Include setup prerequisites (target URLs, test data, mock credentials if applicable)
+  - Specify expected outcomes and verification points for each test scenario
+  - Follow the angular-tester's Research-Plan-Execute workflow structure (Navigate → Snapshot → Interact → Verify)
+  - **Note**: During implementation, the `angular-tester` agent will be invoked as a Task to execute these tests (keeping Playwright tools isolated from the main context)
 
 **IMPORTANT**: If the plan contradicts these guidelines, STOP and revise it before presenting to the user.
 
@@ -245,6 +252,9 @@ After structure approval:
 - [ ] Type checking passes: `npm run typecheck`
 - [ ] Linting passes: `make lint`
 - [ ] Integration tests pass: `make test-integration`
+- [ ] E2E testing guide created at thoughts/shared/e2e-test-guides/[feature].md
+  - Includes user flows, data-testid attributes, expected outcomes
+  - Ready for angular-tester agent (run separately)
 
 #### Manual Verification:
 - [ ] Feature works as expected when tested via UI

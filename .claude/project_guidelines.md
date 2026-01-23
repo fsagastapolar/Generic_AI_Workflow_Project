@@ -33,7 +33,6 @@ When running commands inside Docker containers, use these service names:
 - No Docker required for frontend operations
 
 ### Scope Boundaries
-- **DO NOT** operate outside the existing backend and frontend repositories
 - **DO NOT** create new repositories
 
 ## Database Requirements (MANDATORY)

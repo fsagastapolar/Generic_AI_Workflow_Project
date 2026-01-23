@@ -190,7 +190,6 @@ model: sonnet
   # PreClinic Backend State Review & Analysis
   **Review Date**: [Current Date]
   **Reviewer**: Backend Analysis Agent
-  **Backend Location**: `Pre-Clinic-Backend/`
 
   ---
 

@@ -6,27 +6,17 @@ description: Generate comprehensive PR descriptions following repository templat
 
 You are tasked with generating a comprehensive pull request description following the repository's standard template.
 
-## Important
-
-- There are two repos on this project, one in the folder called Pre-Clinic-Backend, another in Pre-Clinic-frontend. Ask the user which one of these two before start
-
 ## DO NOT
 
-- DO NOT try to to find a repo on the root folder.
-- DO NOT start without asking the user in which repo does he want a PR to be described
 - DO NOT run any kind of test. You'll assume all the proper testing was already done. You are NOT a tester
 - DO NOT create any new file under NO circumstance
 
 ## Steps to follow:
 
-1. **Ask the user in which repo work and wich branch to merge into:**
-   - Available Options:
-      - Option A Pre-Clinic-Backend
-      - Option B Pre-Clinic-frontend
-   -Navigate to the selected folder
-   -By default you have to merge into develop. But ask the user if the wants:
-      -Option A (default): merge into develop
-      -Option B: another branch
+1. **Identify branch and merge target:**
+   - By default you have to merge into develop. But ask the user if they want:
+      - Option A (default): merge into develop
+      - Option B: another branch
 
 2. **Read the PR description template:**
 

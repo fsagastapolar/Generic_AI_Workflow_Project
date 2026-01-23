@@ -9,7 +9,6 @@ You are tasked with creating git commits for the changes made during this sessio
 ## Project Guidelines Reference
 
 This command follows the git workflow defined in `.claude/project_guidelines.md`:
-- There are two repos on this project, one in the folder called Pre-Clinic-Backend, another in Pre-Clinic-frontend. If you are not sure which repo to check, ask the user which one of these two
 - Always branch from `develop`
 - Never commit directly to `develop` or `main`
 - Create descriptive branch names

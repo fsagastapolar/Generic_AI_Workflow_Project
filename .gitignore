@@ -1,0 +1,10 @@
+node_modules/
+.env
+.env.local
+.DS_Store
+*.log
+dist/
+build/
+.claude/mcp_config.json
+.claude/mcp_config_merged.json
+.claude/settings.local.json

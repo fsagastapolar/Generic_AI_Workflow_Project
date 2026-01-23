@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": []
+  },
+  "enableAllProjectMcpServers": false,
+  "enabledMcpjsonServers": ["linear", "playwright"],
+  "env": {
+    "MAX_THINKING_TOKENS": "32000"
+  }
+}

@@ -1,0 +1,110 @@
+---
+description: Generate comprehensive PR descriptions following repository templates
+---
+
+# Generate PR Description
+
+You are tasked with generating a comprehensive pull request description following the repository's standard template.
+
+## Important
+
+- There are two repos on this project, one in the folder called Pre-Clinic-Backend, another in Pre-Clinic-frontend. Ask the user which one of these two before start
+
+## DO NOT
+
+- DO NOT try to to find a repo on the root folder.
+- DO NOT start without asking the user in which repo does he want a PR to be described
+- DO NOT run any kind of test. You'll assume all the proper testing was already done. You are NOT a tester
+- DO NOT create any new file under NO circumstance
+
+## Steps to follow:
+
+1. **Ask the user in which repo work and wich branch to merge into:**
+   - Available Options:
+      - Option A Pre-Clinic-Backend
+      - Option B Pre-Clinic-frontend
+   -Navigate to the selected folder
+   -By default you have to merge into develop. But ask the user if the wants:
+      -Option A (default): merge into develop
+      -Option B: another branch
+
+2. **Read the PR description template:**
+
+    - Use the following PR description template:
+
+        ```md
+        ## What problem(s) was I solving?
+
+        ## What user-facing changes did I ship?
+
+        ## How I implemented it
+
+        ## How to verify it
+
+        ### Manual Testing
+
+        ## Description for the changelog
+        ```
+
+    - Read the template carefully to understand all sections and requirements
+    - You can check the file thoughts\shared\pr_description.md for a template
+
+3. **Identify the PR to describe:**
+   - Check if the current branch has an associated PR: `gh pr view --json url,number,title,state 2>/dev/null`
+   - If no PR exists for the current branch, ask the user if he wants you to create a new one
+   - Ask the user which PR they want to describe
+
+4. **Check for existing description:**
+   - Check if `/tmp/{repo_name}/prs/{number}_description.md` already exists
+   - If it exists, read it and inform the user you'll be updating it
+   - Consider what has changed since the last description was written
+
+5. **Gather comprehensive PR information:**
+   - Get the full PR diff: `gh pr diff {number}`
+   - If you get an error about no default remote repository, instruct the user to run `gh repo set-default` and select the appropriate repository
+   - Get commit history: `gh pr view {number} --json commits`
+   - Review the base branch: `gh pr view {number} --json baseRefName`
+   - Get PR metadata: `gh pr view {number} --json url,title,number,state`
+
+6. **Analyze the changes thoroughly:** (ultrathink about the code changes, their architectural implications, and potential impacts)
+   - Read through the entire diff carefully
+   - For context, read any files that are referenced but not shown in the diff
+   - Understand the purpose and impact of each change
+   - Identify user-facing changes vs internal implementation details
+   - Look for breaking changes or migration requirements
+
+7. **Handle verification requirements:**
+   - Look for any checklist items in the "How to verify it" section of the template
+   - For each verification step:
+     - If it's a command you can run (like `make check test`, `npm test`, etc.), run it
+     - If it passes, mark the checkbox as checked: `- [x]`
+     - If it fails, keep it unchecked and note what failed: `- [ ]` with explanation
+     - If it requires manual testing (UI interactions, external services), leave unchecked and note for user
+   - Document any verification steps you couldn't complete
+
+8. **Generate the description:**
+   - Fill out each section from the template thoroughly:
+     - Answer each question/section based on your analysis
+     - Be specific about problems solved and changes made
+     - Focus on user impact where relevant
+     - Include technical details in appropriate sections
+     - Write a concise changelog entry
+   - Ensure all checklist items are addressed (checked or explained)
+
+9. **Save and sync the description:**
+   - Write the completed description to `/tmp/{repo_name}/prs/{number}_description.md`
+   - Show the user the generated description
+
+10. **Update the PR:**
+   - Update the PR description directly: `gh pr edit {number} --body-file /tmp/{repo_name}/prs/{number}_description.md`
+   - Confirm the update was successful
+   - If any verification steps remain unchecked, remind the user to complete them before merging
+
+## Important notes:
+- This command works across different repositories - always read the local template
+- Be thorough but concise - descriptions should be scannable
+- Focus on the "why" as much as the "what"
+- Include any breaking changes or migration notes prominently
+- If the PR touches multiple components, organize the description accordingly
+- Always attempt to run verification commands when possible
+- Clearly communicate which verification steps need manual testing

@@ -14,6 +14,12 @@ You are tasked with generating a comprehensive pull request description followin
    - Read the template carefully to understand all sections and requirements
 
 2. **Identify the PR to describe:**
+   - Ask for the desired merge target:
+     - Option A (default): merge into `develop`
+     - Option B: another branch
+   - If the user selects Option B, fetch and display only remote branches for selection:
+     - Use `git branch -r | grep -v "origin/HEAD"` to list remote branches
+     - Present them as a numbered list for the user to choose from
    - Check if the current branch has an associated PR: `gh pr view --json url,number,title,state 2>/dev/null`
    - If no PR exists for the current branch, or if on main/master, list open PRs: `gh pr list --limit 10 --json number,title,headRefName,author`
    - Ask the user which PR they want to describe

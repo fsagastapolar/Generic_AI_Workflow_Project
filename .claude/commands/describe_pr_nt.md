@@ -17,6 +17,8 @@ You are tasked with generating a comprehensive pull request description followin
    - By default you have to merge into develop. But ask the user if they want:
       - Option A (default): merge into develop
       - Option B: another branch
+   - If the user selects Option B, fetch all remote branches using `git branch -r` and display them as a numbered list for the user to choose from
+   - Only show remote branches (branches from the remote repository), filtering out the HEAD pointer
 
 2. **Read the PR description template:**
 

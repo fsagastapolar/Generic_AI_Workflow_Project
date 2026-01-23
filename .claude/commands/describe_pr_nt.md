@@ -37,7 +37,7 @@ You are tasked with generating a comprehensive pull request description followin
         ```
 
     - Read the template carefully to understand all sections and requirements
-    - You can check the file thoughts\shared\pr_description.md for a template
+    - You can check the file thoughts/shared/templates/pr_description.md for a template
 
 3. **Identify the PR to describe:**
    - Check if the current branch has an associated PR: `gh pr view --json url,number,title,state 2>/dev/null`

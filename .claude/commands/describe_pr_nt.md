@@ -27,11 +27,11 @@ apt-cache policy gh | grep "cli.github.com"  # Should show GitHub's official rep
 ## Steps to follow:
 
 1. **Identify branch and merge target:**
-   - By default you have to merge into develop. But ask the user if they want:
-      - Option A (default): merge into develop
-      - Option B: another branch
-   - If the user selects Option B, fetch all remote branches using `git branch -r` and display them as a numbered list for the user to choose from
-   - Only show remote branches (branches from the remote repository), filtering out the HEAD pointer
+   - Get the current branch: `git branch --show-current`
+   - Prune stale remote references and fetch: `git fetch --prune`
+   - List active remote branches, excluding the current branch: `git branch -r | grep -v "origin/HEAD" | grep -v "origin/$(git branch --show-current)"`
+   - Present the remaining branches as a numbered list for the user to choose from
+   - Ask the user to select the base branch for the PR
 
 2. **Read the PR description template:**
 
@@ -54,10 +54,10 @@ apt-cache policy gh | grep "cli.github.com"  # Should show GitHub's official rep
     - Read the template carefully to understand all sections and requirements
     - You can check the file thoughts/shared/templates/pr_description.md for a template
 
-3. **Identify the PR to describe:**
-   - Check if the current branch has an associated PR: `gh pr view --json url,number,title,state 2>/dev/null`
-   - If no PR exists for the current branch, ask the user if he wants you to create a new one
-   - Ask the user which PR they want to describe
+3. **Create the PR:**
+   - Assume no PR exists yet for the current branch
+   - Create a new PR targeting the selected base branch: `gh pr create --base {selected_branch} --title "{branch_name}" --body ""`
+   - Note the PR number from the output for use in subsequent steps
 
 4. **Check for existing description:**
    - Check if `/tmp/{repo_name}/prs/{number}_description.md` already exists

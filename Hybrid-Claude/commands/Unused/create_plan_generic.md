@@ -1,5 +1,5 @@
 ---
-description: Create detailed implementation plans through interactive research and iteration
+description: Create detailed implementation plans with thorough research and iteration
 model: opus
 ---
 
@@ -17,14 +17,13 @@ Before creating any implementation plan, read and understand the project guideli
 - **Database**: MySQL ONLY via Docker (`mysql` service), NEVER SQLite
 - **Testing**: All changes require tests, never modify tests to hide bugs
 - **Manual Testing**: Plans must include manual testing steps for the testing guide
-- **FrontEnd Testing**: Only for plans that include frontend changes
 
 **Incorporate these into your plan**:
 - Include proper git workflow steps (create branch from develop)
 - Specify Docker commands for backend operations (using `app` or `mysql` services)
 - Never suggest SQLite for any purpose
 - Include comprehensive test requirements in success criteria
-- Plan for manual testing documentation to be created after implementation, the output format should be a md file to be stored in the thoughts/shared/testing directory
+- Plan for manual testing documentation to be created after implementation
 - If the plan includes **API/backend modifications**, include a step to create an API E2E testing guide (after implementation) using the `e2e-test-guide-creator` agent. The guide will be stored in `thoughts/shared/e2e-test-guides/` and should include:
   - Ready-to-run curl commands with complete headers and JSON bodies
   - Seeded data IDs from database seeders (users, entities, etc.)
@@ -33,13 +32,7 @@ Before creating any implementation plan, read and understand the project guideli
   - Entity creation steps when seeded data is insufficient
   - Edge case testing scenarios (validation errors, authorization failures)
   - **Note**: During implementation, the `e2e-test-guide-creator` agent will be invoked as a Task to generate these comprehensive API test guides
-- If the plan includes **frontend modifications**, include a step to create a frontend E2E testing guide (after implementation) for the `angular-tester` agent. The guide should:
-  - Document specific user flows and test scenarios for the `angular-tester` agent to execute
-  - List all `data-testid` attributes that must be added to components for reliable test selection (highest priority selector)
-  - Include setup prerequisites (target URLs, test data, mock credentials if applicable)
-  - Specify expected outcomes and verification points for each test scenario
-  - Follow the angular-tester's Research-Plan-Execute workflow structure (Navigate → Snapshot → Interact → Verify)
-  - **Note**: During implementation, the `angular-tester` agent will be invoked as a Task to execute these tests (keeping Playwright tools isolated from the main context)
+- If the plan includes **frontend modifications**, include a step to create a frontend E2E testing guide (after implementation) for the `angular-tester` agent with test scenarios, data-testid attributes, and verification points
 
 **IMPORTANT**: If the plan contradicts these guidelines, STOP and revise it before presenting to the user.
 
@@ -92,7 +85,6 @@ Then wait for the user's input.
 
    These agents will:
    - Find relevant source files, configs, and tests
-   - Identify the specific directories to focus on
    - Trace data flow and key functions
    - Return detailed explanations with file:line references
 
@@ -312,9 +304,12 @@ After structure approval:
 - Similar implementation: `[file:line]`
 ````
 
-### Step 5: Review
+### Step 5: Sync and Review
 
-1. **Present the draft plan location**:
+1. **Sync the thoughts directory**:
+   - This ensures the plan is properly indexed and available
+
+2. **Present the draft plan location**:
    ```
    I've created the initial implementation plan at:
    `thoughts/shared/plans/YYYY-MM-DD-ENG-XXXX-description.md`
@@ -326,13 +321,13 @@ After structure approval:
    - Missing edge cases or considerations?
    ```
 
-2. **Iterate based on feedback** - be ready to:
+3. **Iterate based on feedback** - be ready to:
    - Add missing phases
    - Adjust technical approach
    - Clarify success criteria (both automated and manual)
    - Add/remove scope items
 
-3. **Continue refining** until the user is satisfied
+4. **Continue refining** until the user is satisfied
 
 ## Important Guidelines
 
@@ -353,7 +348,6 @@ After structure approval:
    - Research actual code patterns using parallel sub-tasks
    - Include specific file paths and line numbers
    - Write measurable success criteria with clear automated vs manual distinction
-   - automated steps should use `make` whenever possible
 
 4. **Be Practical**:
    - Focus on incremental, testable changes
@@ -379,16 +373,15 @@ After structure approval:
 
 1. **Automated Verification** (can be run by execution agents):
    - Commands that can be run: `make test`, `npm run lint`, etc.
-   - Specific files that should exist (including E2E testing guides)
+   - Specific files that should exist
    - Code compilation/type checking
-   - Unit and integration test suites
+   - Automated test suites
 
-2. **Manual Verification** (requires human judgment):
-   - Visual design and aesthetics
-   - Accessibility and screen reader experience
-   - Performance feel under real conditions
-   - Cross-browser compatibility
-   - User acceptance criteria requiring subjective evaluation
+2. **Manual Verification** (requires human testing):
+   - UI/UX functionality
+   - Performance under real conditions
+   - Edge cases that are hard to automate
+   - User acceptance criteria
 
 **Format example:**
 ```markdown
@@ -399,13 +392,11 @@ After structure approval:
 - [ ] All unit tests pass: `go test ./...`
 - [ ] No linting errors: `golangci-lint run`
 - [ ] API endpoint returns 200: `curl localhost:8080/api/new-endpoint`
-- [ ] E2E testing guide created at thoughts/shared/e2e-test-guides/[feature].md
-  - Includes user flows, data-testid attributes, expected outcomes
-  - Ready for angular-tester agent (run separately)
 
 #### Manual Verification:
-- [ ] Visual design matches requirements
-- [ ] Accessible via keyboard navigation and screen readers
+- [ ] New feature appears correctly in the UI
+- [ ] Performance is acceptable with 1000+ items
+- [ ] Error messages are user-friendly
 - [ ] Feature works correctly on mobile devices
 ```
 
@@ -443,7 +434,6 @@ When spawning research sub-tasks:
    - What information to extract
    - Expected output format
 4. **Be EXTREMELY specific about directories**:
-   - Identify the relevant subdirectory for the task (e.g., frontend, backend, specific service)
    - Include the full path context in your prompts
 5. **Specify read-only tools** to use
 6. **Request specific file:line references** in responses
@@ -467,7 +457,7 @@ tasks = [
 ## Example Interaction Flow
 
 ```
-User: /create_plan
+User: /implementation_plan
 Assistant: I'll help you create a detailed implementation plan...
 
 User: We need to add parent-child tracking for Claude sub-tasks. See thoughts/allison/tickets/eng_1478.md
@@ -475,7 +465,7 @@ Assistant: Let me read that ticket file completely first...
 
 [Reads file fully]
 
-Based on the ticket, I understand we need to track parent-child relationships for Claude sub-task events in the hld daemon. Before I start planning, I have some questions...
+Based on the ticket, I understand we need to track parent-child relationships for Claude sub-task events in the daemon. Before I start planning, I have some questions...
 
 [Interactive process continues...]
 ```

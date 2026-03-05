@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "linear": {
+      "command": "node",
+      "args": [
+        "node_modules/@mseep/linear-mcp-server/dist/index.js"
+      ],
+      "env": {
+        "LINEAR_API_KEY": "your_linear_api_key_here"
+      }
+    }
+  }
+}

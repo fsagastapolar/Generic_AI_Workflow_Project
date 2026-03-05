@@ -1,5 +1,5 @@
 ---
-description: Create detailed implementation plans through interactive research and iteration
+description: Create implementation plans with thorough research (no thoughts directory)
 model: opus
 ---
 
@@ -17,7 +17,6 @@ Before creating any implementation plan, read and understand the project guideli
 - **Database**: MySQL ONLY via Docker (`mysql` service), NEVER SQLite
 - **Testing**: All changes require tests, never modify tests to hide bugs
 - **Manual Testing**: Plans must include manual testing steps for the testing guide
-- **FrontEnd Testing**: Only for plans that include frontend changes
 
 **Incorporate these into your plan**:
 - Include proper git workflow steps (create branch from develop)
@@ -63,8 +62,8 @@ Please provide:
 
 I'll analyze this information and work with you to create a comprehensive plan.
 
-Tip: You can also invoke this command with a ticket file directly: `/create_plan thoughts/allison/tickets/eng_1234.md`
-For deeper analysis, try: `/create_plan think deeply about thoughts/allison/tickets/eng_1234.md`
+Tip: You can also invoke this command with a ticket file directly: `/create_plan thoughts/shared/tickets/eng_1234.md`
+For deeper analysis, try: `/create_plan think deeply about thoughts/shared/tickets/eng_1234.md`
 ```
 
 Then wait for the user's input.
@@ -74,7 +73,7 @@ Then wait for the user's input.
 ### Step 1: Context Gathering & Initial Analysis
 
 1. **Read all mentioned files immediately and FULLY**:
-   - Ticket files (e.g., `thoughts/allison/tickets/eng_1234.md`)
+   - Ticket files (e.g., `thoughts/shared/tickets/eng_1234.md`)
    - Research documents
    - Related implementation plans
    - Any JSON/data files mentioned
@@ -87,12 +86,11 @@ Then wait for the user's input.
 
    - Use the **codebase-locator** agent to find all files related to the ticket/task
    - Use the **codebase-analyzer** agent to understand how the current implementation works
-   - If relevant, use the **thoughts-locator** agent to find any existing thoughts documents about this feature
    - If a Linear ticket is mentioned, use the **linear-ticket-reader** agent to get full details
 
    These agents will:
    - Find relevant source files, configs, and tests
-   - Identify the specific directories to focus on
+   - Identify the specific directories to focus on (e.g., if WUI is mentioned, they'll focus on humanlayer-wui/)
    - Trace data flow and key functions
    - Return detailed explanations with file:line references
 
@@ -144,10 +142,6 @@ After getting initial clarifications:
    - **codebase-locator** - To find more specific files (e.g., "find all files that handle [specific component]")
    - **codebase-analyzer** - To understand implementation details (e.g., "analyze how [system] works")
    - **codebase-pattern-finder** - To find similar features we can model after
-
-   **For historical context:**
-   - **thoughts-locator** - To find any research, plans, or decisions about this area
-   - **thoughts-analyzer** - To extract key insights from the most relevant documents
 
    **For related tickets:**
    - **linear-searcher** - To find similar issues or past implementations
@@ -266,6 +260,9 @@ After structure approval:
 - [ ] Type checking passes: `npm run typecheck`
 - [ ] Linting passes: `make lint`
 - [ ] Integration tests pass: `make test-integration`
+- [ ] E2E testing guide created at thoughts/shared/e2e-test-guides/[feature].md
+  - Includes user flows, data-testid attributes, expected outcomes
+  - Ready for angular-tester agent (run separately)
 
 #### Manual Verification:
 - [ ] Feature works as expected when tested via UI
@@ -307,7 +304,7 @@ After structure approval:
 
 ## References
 
-- Original ticket: `thoughts/allison/tickets/eng_XXXX.md`
+- Original ticket: `thoughts/shared/tickets/eng_XXXX.md`
 - Related research: `thoughts/shared/research/[relevant].md`
 - Similar implementation: `[file:line]`
 ````
@@ -353,7 +350,7 @@ After structure approval:
    - Research actual code patterns using parallel sub-tasks
    - Include specific file paths and line numbers
    - Write measurable success criteria with clear automated vs manual distinction
-   - automated steps should use `make` whenever possible
+   - automated steps should use `make` whenever possible - for example `make -C humanlayer-wui check` instead of `cd humanlayer-wui && bun run fmt`
 
 4. **Be Practical**:
    - Focus on incremental, testable changes
@@ -379,16 +376,15 @@ After structure approval:
 
 1. **Automated Verification** (can be run by execution agents):
    - Commands that can be run: `make test`, `npm run lint`, etc.
-   - Specific files that should exist (including E2E testing guides)
+   - Specific files that should exist
    - Code compilation/type checking
-   - Unit and integration test suites
+   - Automated test suites
 
-2. **Manual Verification** (requires human judgment):
-   - Visual design and aesthetics
-   - Accessibility and screen reader experience
-   - Performance feel under real conditions
-   - Cross-browser compatibility
-   - User acceptance criteria requiring subjective evaluation
+2. **Manual Verification** (requires human testing):
+   - UI/UX functionality
+   - Performance under real conditions
+   - Edge cases that are hard to automate
+   - User acceptance criteria
 
 **Format example:**
 ```markdown
@@ -399,13 +395,11 @@ After structure approval:
 - [ ] All unit tests pass: `go test ./...`
 - [ ] No linting errors: `golangci-lint run`
 - [ ] API endpoint returns 200: `curl localhost:8080/api/new-endpoint`
-- [ ] E2E testing guide created at thoughts/shared/e2e-test-guides/[feature].md
-  - Includes user flows, data-testid attributes, expected outcomes
-  - Ready for angular-tester agent (run separately)
 
 #### Manual Verification:
-- [ ] Visual design matches requirements
-- [ ] Accessible via keyboard navigation and screen readers
+- [ ] New feature appears correctly in the UI
+- [ ] Performance is acceptable with 1000+ items
+- [ ] Error messages are user-friendly
 - [ ] Feature works correctly on mobile devices
 ```
 
@@ -443,7 +437,9 @@ When spawning research sub-tasks:
    - What information to extract
    - Expected output format
 4. **Be EXTREMELY specific about directories**:
-   - Identify the relevant subdirectory for the task (e.g., frontend, backend, specific service)
+   - If the ticket mentions "WUI", specify `humanlayer-wui/` directory
+   - If it mentions "daemon", specify `hld/` directory
+   - Never use generic terms like "UI" when you mean "WUI"
    - Include the full path context in your prompts
 5. **Specify read-only tools** to use
 6. **Request specific file:line references** in responses
@@ -470,7 +466,7 @@ tasks = [
 User: /create_plan
 Assistant: I'll help you create a detailed implementation plan...
 
-User: We need to add parent-child tracking for Claude sub-tasks. See thoughts/allison/tickets/eng_1478.md
+User: We need to add parent-child tracking for Claude sub-tasks. See thoughts/shared/tickets/eng_1478.md
 Assistant: Let me read that ticket file completely first...
 
 [Reads file fully]

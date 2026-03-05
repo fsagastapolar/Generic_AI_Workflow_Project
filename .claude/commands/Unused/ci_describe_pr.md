@@ -21,44 +21,39 @@ apt-cache policy gh | grep "cli.github.com"  # Should show GitHub's official rep
 
 ## Steps to follow:
 
-1. **Identify branch and merge target:**
-   - By default, merge into `develop`. Ask the user if they prefer:
-     - Option A (default): merge into `develop`
-     - Option B: another branch
-   - If the user selects Option B, fetch all remote branches and display them as options:
-     - List only remote branches: `git branch -r | grep -v "origin/HEAD"`
-     - Present the branches as a numbered list for the user to choose from
-
-2. **Read the PR description template:**
+1. **Read the PR description template:**
    - First, check if `thoughts/shared/templates/pr_description.md` exists
    - If it doesn't exist, inform the user that their `humanlayer thoughts` setup is incomplete and they need to create a PR description template at `thoughts/shared/templates/pr_description.md`
    - Read the template carefully to understand all sections and requirements
 
-3. **Identify the PR to describe:**
-   - Check if the current branch has an associated PR: `gh pr view --json url,number,title,state 2>/dev/null`
-   - If no PR exists for the current branch, or if on main/master, list open PRs: `gh pr list --limit 10 --json number,title,headRefName,author`
-   - Ask the user which PR they want to describe
+2. **Identify branch and create PR:**
+   - Fetch all remote branches: `git branch -r | grep -v "origin/HEAD"`
+   - Present them as a numbered list for the user to choose from
+   - Ask the user to select the base branch for the PR
+   - Assume no PR exists yet for the current branch
+   - Create a new PR targeting the selected base branch: `gh pr create --base {selected_branch} --title "{branch_name}" --body ""`
+   - Note the PR number from the output for use in subsequent steps
 
-4. **Check for existing description:**
+3. **Check for existing description:**
    - Check if `thoughts/shared/prs/{number}_description.md` already exists
    - If it exists, read it and inform the user you'll be updating it
    - Consider what has changed since the last description was written
 
-5. **Gather comprehensive PR information:**
+4. **Gather comprehensive PR information:**
    - Get the full PR diff: `gh pr diff {number}`
    - If you get an error about no default remote repository, instruct the user to run `gh repo set-default` and select the appropriate repository
    - Get commit history: `gh pr view {number} --json commits`
    - Review the base branch: `gh pr view {number} --json baseRefName`
    - Get PR metadata: `gh pr view {number} --json url,title,number,state`
 
-6. **Analyze the changes thoroughly:** (ultrathink about the code changes, their architectural implications, and potential impacts)
+5. **Analyze the changes thoroughly:** (ultrathink about the code changes, their architectural implications, and potential impacts)
    - Read through the entire diff carefully
    - For context, read any files that are referenced but not shown in the diff
    - Understand the purpose and impact of each change
    - Identify user-facing changes vs internal implementation details
    - Look for breaking changes or migration requirements
 
-7. **Handle verification requirements:**
+6. **Handle verification requirements:**
    - Look for any checklist items in the "How to verify it" section of the template
    - For each verification step:
      - If it's a command you can run (like `make check test`, `npm test`, etc.), run it
@@ -67,7 +62,7 @@ apt-cache policy gh | grep "cli.github.com"  # Should show GitHub's official rep
      - If it requires manual testing (UI interactions, external services), leave unchecked and note for user
    - Document any verification steps you couldn't complete
 
-8. **Generate the description:**
+7. **Generate the description:**
    - Fill out each section from the template thoroughly:
      - Answer each question/section based on your analysis
      - Be specific about problems solved and changes made
@@ -76,12 +71,12 @@ apt-cache policy gh | grep "cli.github.com"  # Should show GitHub's official rep
      - Write a concise changelog entry
    - Ensure all checklist items are addressed (checked or explained)
 
-9. **Save and sync the description:**
+8. **Save and sync the description:**
    - Write the completed description to `thoughts/shared/prs/{number}_description.md`
    - Run `humanlayer thoughts sync` to sync the thoughts directory
    - Show the user the generated description
 
-10. **Update the PR:**
+9. **Update the PR:**
    - Update the PR description directly: `gh pr edit {number} --body-file thoughts/shared/prs/{number}_description.md`
    - Confirm the update was successful
    - If any verification steps remain unchecked, remind the user to complete them before merging

@@ -65,8 +65,10 @@ type: implementation_strategy
 ```
 ---
 
-### 3. Complete
-Once the document is written, you should respond to the user with the template between <template_response></template_response> XML tags. do NOT include the tags in your response.
+### 3. Approve and Sync
+Run `humanlayer thoughts sync` to save the document.
+
+Once this is completed, you should respond to the user with the template between <template_response></template_response> XML tags. do NOT include the tags in your response.
 
 <template_response>
 Handoff created and synced! You can resume from this handoff in a new session with the following command:

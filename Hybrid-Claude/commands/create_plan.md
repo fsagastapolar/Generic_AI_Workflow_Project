@@ -92,7 +92,7 @@ Then wait for the user's input.
 
    These agents will:
    - Find relevant source files, configs, and tests
-   - Identify the specific directories to focus on
+   - Identify the specific directories to focus on (e.g., if WUI is mentioned, they'll focus on humanlayer-wui/)
    - Trace data flow and key functions
    - Return detailed explanations with file:line references
 
@@ -312,9 +312,13 @@ After structure approval:
 - Similar implementation: `[file:line]`
 ````
 
-### Step 5: Review
+### Step 5: Sync and Review
 
-1. **Present the draft plan location**:
+1. **Sync the thoughts directory**:
+   - Run `humanlayer thoughts sync` to sync the newly created plan
+   - This ensures the plan is properly indexed and available
+
+2. **Present the draft plan location**:
    ```
    I've created the initial implementation plan at:
    `thoughts/shared/plans/YYYY-MM-DD-ENG-XXXX-description.md`
@@ -326,13 +330,14 @@ After structure approval:
    - Missing edge cases or considerations?
    ```
 
-2. **Iterate based on feedback** - be ready to:
+3. **Iterate based on feedback** - be ready to:
    - Add missing phases
    - Adjust technical approach
    - Clarify success criteria (both automated and manual)
    - Add/remove scope items
+   - After making changes, run `humanlayer thoughts sync` again
 
-3. **Continue refining** until the user is satisfied
+4. **Continue refining** until the user is satisfied
 
 ## Important Guidelines
 
@@ -353,7 +358,7 @@ After structure approval:
    - Research actual code patterns using parallel sub-tasks
    - Include specific file paths and line numbers
    - Write measurable success criteria with clear automated vs manual distinction
-   - automated steps should use `make` whenever possible
+   - automated steps should use `make` whenever possible - for example `make -C humanlayer-wui check` instead of `cd humanlayer-wui && bun run fmt`
 
 4. **Be Practical**:
    - Focus on incremental, testable changes
@@ -443,7 +448,9 @@ When spawning research sub-tasks:
    - What information to extract
    - Expected output format
 4. **Be EXTREMELY specific about directories**:
-   - Identify the relevant subdirectory for the task (e.g., frontend, backend, specific service)
+   - If the ticket mentions "WUI", specify `humanlayer-wui/` directory
+   - If it mentions "daemon", specify `hld/` directory
+   - Never use generic terms like "UI" when you mean "WUI"
    - Include the full path context in your prompts
 5. **Specify read-only tools** to use
 6. **Request specific file:line references** in responses

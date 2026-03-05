@@ -18,23 +18,6 @@ When given a plan path:
 
 If no plan path provided, ask for one.
 
-## Branch Selection (MANDATORY - Before Any Implementation)
-
-Before reading the plan or touching any code, you must determine which branch to work on:
-
-1. **Get the current branch**: Run `git branch --show-current` to find out the active branch.
-
-2. **Present options to the user** using `AskUserQuestion` with these three choices:
-   - **Stay on current branch** (`<current-branch-name>`) — continue working where you are
-   - **Branch out from current** — suggest a branch name derived from the plan filename or ticket (e.g. `feature/eng-1234-short-description`), show it clearly as the suggestion
-   - **Custom branch name** — let the user type their own
-
-3. **If the user selects "Branch out"** (either the suggested name or a custom one):
-   - Run `git checkout -b <branch-name>` before proceeding
-   - Confirm to the user that the new branch was created and you are now on it
-
-4. **Then continue** with reading the plan and implementing.
-
 ## Implementation Philosophy
 
 Plans are carefully designed, but reality can be messy. Your job is to:
@@ -93,21 +76,13 @@ If instructed to execute multiple phases consecutively, skip the pause until the
 do not check off items in the manual testing steps until confirmed by the user.
 
 
-## Manual Testing Documentation (OPTIONAL - User Decides)
+## Manual Testing Documentation (MANDATORY)
 
-After completing ALL phases and ALL automated verification passes, **ask the user** whether they want a testing guide generated before doing anything else.
-
-Use `AskUserQuestion` with two options:
-- **Yes, create a testing guide** — proceed with the guide creation steps below
-- **No, skip the guide** — mark implementation complete without creating a guide
-
-Only proceed with guide creation if the user confirms. If the user skips, mark the implementation as complete immediately.
+After completing ALL phases and ALL automated verification passes, you MUST create appropriate testing guides before marking the implementation as complete.
 
 ### Testing Guide Strategy
 
 Based on what was implemented, create the appropriate testing guides:
-
----
 
 #### For API/Backend Changes: Create E2E API Test Guide
 
@@ -194,118 +169,55 @@ For features requiring manual verification (UI interactions, visual testing, or 
 | Implementation Type | Create API E2E Guide | Create Manual Guide | Create Frontend E2E Guide |
 |---------------------|----------------------|---------------------|---------------------------|
 | Backend API only | ✅ Yes (invoke e2e-test-guide-creator) | Optional (if complex workflows) | ❌ No |
-| Frontend only | ❌ No | Optional | ✅ Yes (for [this_project_frontend_playwright_tester_agent]) |
-| Full-stack (API + UI) | ✅ Yes (invoke e2e-test-guide-creator) | Optional | ✅ Yes (for [this_project_frontend_playwright_tester_agent]) |
+| Frontend only | ❌ No | Optional | ✅ Yes (for angular-tester) |
+| Full-stack (API + UI) | ✅ Yes (invoke e2e-test-guide-creator) | Optional | ✅ Yes (for angular-tester) |
 | Database/infra only | ❌ No | ✅ Yes | ❌ No |
 
-**IMPORTANT**:
+**IMPORTANT**: 
 - For API changes, ALWAYS use the `e2e-test-guide-creator` agent (via Task tool) - do not write API test guides manually
 - The agent will research seeders, analyze endpoints, and generate complete curl commands
-- Only create guides if the user confirmed they want one — never auto-generate without asking
+- Do not mark implementation complete until appropriate testing guide(s) are created
 
-## Session Token Budget Check (MANDATORY - After Every Phase)
+## Frontend E2E Testing with angular-tester (CONDITIONAL)
 
-After completing each phase (before proceeding to the next), **self-assess the current session size**. Consider:
-- How many phases have been completed
-- How many files have been read and modified
-- How many tool calls and sub-agents have been used so far
-- How long and deep the conversation context has become
+If the implementation includes frontend changes and an E2E testing guide was created in `thoughts/shared/e2e-test-guides/`, you MUST invoke the `angular-tester` agent to execute the automated E2E tests.
 
-If you judge that the session is consuming substantial context (roughly approaching or exceeding 70k tokens in the main conversation), **pause and prompt the user** using `AskUserQuestion`:
+### When to Use angular-tester
 
-- **Continue anyway** — proceed with the next phase in this session
-- **Stop and preserve progress** — stop now to keep this session lean
-
-If the user chooses to stop, follow the **Stop & Handoff Flow** below.
-
-> **Note**: This check is heuristic — Claude cannot query exact token counts. Use your judgment. Err on the side of surfacing the prompt if you feel the session is getting heavy.
-
----
-
-## Stop & Handoff Flow (MANDATORY - At Any Planned Stop Point)
-
-Whenever the session reaches a planned stop (either the **token budget check** above or the **frontend phase gate** below), you MUST offer to create a handoff document before halting.
-
-Use `AskUserQuestion` with these options:
-- **Yes, create a handoff** — invoke the `create_handoff` skill so the next session can resume seamlessly
-- **No, just stop** — halt without creating a document
-
-If the user chooses to create a handoff, invoke the `create_handoff` skill. After the handoff is created, present the final stop summary to the user.
-
----
-
-## Frontend Phase Gate (MANDATORY - Before Starting Frontend Work)
-
-If the plan includes both backend and frontend phases, you **MUST pause before beginning any frontend work** and ask the user how they want to proceed.
-
-Use `AskUserQuestion` with these options:
-- **Continue in this session** — proceed with frontend implementation now
-- **Stop here** — end the session so the user can clear the terminal and start fresh for the frontend phase
-
-If the user chooses to stop:
-1. Present a clear summary of what backend work was completed and which frontend phases remain.
-2. Follow the **Stop & Handoff Flow** above to offer a handoff document.
-3. Halt. The user will resume by running `/implement_plan` again with the same plan path.
-
----
-
-## Frontend E2E Testing with [this_project_frontend_playwright_tester_agent] (CONDITIONAL)
-
-If the implementation includes frontend changes and an E2E testing guide was created in `thoughts/shared/e2e-test-guides/`, you MUST ask the user before invoking the `[this_project_frontend_playwright_tester_agent]` agent.
-
-> **Project setup note**: Replace `[this_project_frontend_playwright_tester_agent]` throughout this section with the actual subagent type configured for this project's frontend Playwright testing (e.g. `angular-tester`).
-
-### When to Use [this_project_frontend_playwright_tester_agent]
-
-**Only consider it if ALL of the following are true:**
-1. The plan included frontend modifications (components, templates, or UI logic)
+**Only invoke angular-tester if ALL of the following are true:**
+1. The plan included frontend modifications (Angular components, templates, or UI logic)
 2. An E2E testing guide exists in `thoughts/shared/e2e-test-guides/` with test scenarios
-3. The guide includes testid attributes and user flows to test
+3. The guide includes `data-testid` attributes and user flows to test
 
-**Skip if:**
+**Skip angular-tester if:**
 - No frontend changes were made (backend-only changes)
 - No E2E testing guide was created
 - Only manual visual testing is required (no automated flows)
 
-### Ask Before Running the Frontend Tester (MANDATORY)
+### How to Invoke angular-tester
 
-Before invoking `[this_project_frontend_playwright_tester_agent]`, use `AskUserQuestion` with these options:
-- **Run automated E2E tests** — invoke the frontend tester agent via Task tool (token-heavy, comprehensive)
-- **Skip, I'll test manually** — skip the agent; the user will verify the frontend changes themselves
+After creating the manual testing guide and IF frontend E2E testing is needed:
 
-Only invoke the agent if the user explicitly chooses the automated option.
-
-### How to Invoke [this_project_frontend_playwright_tester_agent]
-
-After the user confirms they want automated testing:
-
-1. **Invoke the agent as a Task**:
+1. **Invoke the angular-tester agent as a Task**:
    ```
    Use the Task tool with:
-   - subagent_type: "[this_project_frontend_playwright_tester_agent]"
+   - subagent_type: "angular-tester"
    - description: "Execute frontend E2E tests"
-   - prompt: "Execute the E2E test scenarios documented in thoughts/shared/e2e-test-guides/YYYY-MM-DD-ENG-XXXX-e2e-test-guide.md. Follow the Research-Plan-Execute workflow for each scenario and report the results.
-
-     CRITICAL - Ensure Fresh Content Before Any Test (do this first, every time):
-     1. Clear the Cache API: `browser_evaluate(() => { caches.keys().then(names => names.forEach(name => caches.delete(name))); })`
-     2. Navigate with a cache-busting query param: `http://localhost:<port>/<path>?_cb=<timestamp>`
-     3. Hard reload after navigation: `browser_evaluate(() => location.reload(true))`
-     4. Wait 1-2 seconds for the page to fully re-render before asserting anything.
-     Never trust cached page content — if something looks outdated, reload before reporting a failure."
+   - prompt: "Execute the E2E test scenarios documented in thoughts/shared/e2e-test-guides/YYYY-MM-DD-ENG-XXXX-e2e-test-guide.md. Follow the Research-Plan-Execute workflow for each scenario and report the results."
    ```
 
-2. **Wait for results**: The agent will execute all test scenarios and report PASS/FAIL status for each
+2. **Wait for angular-tester results**: The agent will execute all test scenarios and report PASS/FAIL status for each
 
 3. **Handle test results**:
    - **If all tests PASS**: Proceed to mark implementation complete
-   - **If any tests FAIL**: Debug the failures, fix the issues, and re-run the agent
+   - **If any tests FAIL**: Debug the failures, fix the issues, and re-run angular-tester
    - Report any failures to the user with details from the agent's output
 
 4. **Present final results**:
    ```
    Frontend E2E Testing Complete
 
-   The frontend tester agent executed all E2E scenarios from the testing guide:
+   The angular-tester agent executed all E2E scenarios from the testing guide:
    - [Scenario 1]: PASS
    - [Scenario 2]: PASS
    - [Scenario 3]: FAIL - [brief description]
@@ -313,17 +225,15 @@ After the user confirms they want automated testing:
    [If failures exist, explain what needs to be fixed]
    ```
 
-### Why Use Task Tool for Frontend Testing
+### Why Use Task Tool for angular-tester
 
-**CRITICAL**: The frontend tester agent MUST be invoked via the Task tool (not directly) because:
+**CRITICAL**: The angular-tester agent MUST be invoked via the Task tool (not directly) because:
 - It has exclusive access to Playwright MCP tools (browser_navigate, browser_click, etc.)
 - These tools are token-heavy and should not bloat the main implementation context
 - Isolating them in a sub-agent keeps the main session efficient
 - The agent operates in a specialized verification mode separate from implementation
 
-**Never invoke Playwright tools directly** - always delegate to the frontend tester agent via Task tool.
-
-**Anti-pattern to avoid**: "Trusting cached content" — always bust cache and hard reload before testing. Stale pages cause false failures even when the dev server has rebuilt.
+**Never invoke Playwright tools directly** - always delegate to angular-tester via Task tool.
 
 ## If You Get Stuck
 

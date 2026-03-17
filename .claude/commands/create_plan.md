@@ -107,7 +107,9 @@ Then wait for the user's input.
    - Note assumptions that need verification
    - Determine true scope based on codebase reality
 
-5. **Present informed understanding and focused questions**:
+5. **Present informed understanding and ask questions ONE AT A TIME**:
+
+   First, present your findings summary:
    ```
    Based on the ticket and my research of the codebase, I understand we need to [accurate summary].
 
@@ -116,13 +118,41 @@ Then wait for the user's input.
    - [Relevant pattern or constraint discovered]
    - [Potential complexity or edge case identified]
 
-   Questions that my research couldn't answer:
-   - [Specific technical question that requires human judgment]
-   - [Business logic clarification]
-   - [Design preference that affects implementation]
+   I have [N] technical questions and [M] business logic questions. Let's go through them one at a time.
    ```
 
-   Only ask questions that you genuinely cannot answer through code investigation.
+   Then ask each question individually, waiting for the user's answer before presenting the next one. Questions are classified into two categories — ask all **Technical** questions first, then all **Business Logic** questions:
+
+   **Technical question format:**
+   ```
+   **[Technical] Q1 of N: [Specific technical question that requires human judgment]**
+
+   1. [Plausible option A] — [brief reason]
+   2. [Plausible option B] — [brief reason]
+   3. [Plausible option C] — [brief reason]
+   4. [Plausible option D] — [brief reason]
+   5. Other / please describe
+
+   > **My recommendation: Option X** — [Detailed reasoning explaining why this option is best compared to the others, referencing codebase patterns, constraints, or trade-offs discovered during research]
+   ```
+
+   **Business logic question format:**
+   ```
+   **[Business Logic] Q1 of M: [Business logic clarification needed]**
+
+   1. [Plausible option A] — [brief reason]
+   2. [Plausible option B] — [brief reason]
+   3. [Plausible option C] — [brief reason]
+   4. [Plausible option D] — [brief reason]
+   5. Other / please describe
+
+   > **My recommendation: Option X** — [Detailed reasoning explaining why this option best fits the business context, user impact, and product goals]
+   ```
+
+   - **CRITICAL**: Only show ONE question at a time. Wait for the user to answer before presenting the next question.
+   - Only ask questions that you genuinely cannot answer through code investigation.
+   - **Always provide at least 4 numbered options per question**, ordered from most to least likely based on your research. Never ask a bare open-ended question.
+   - **Always include a recommendation** with a clear, specific reason that compares the recommended option against the others.
 
 ### Step 2: Research & Discovery
 
@@ -161,7 +191,9 @@ After getting initial clarifications:
 
 3. **Wait for ALL sub-tasks to complete** before proceeding
 
-4. **Present findings and design options**:
+4. **Present findings and design options ONE AT A TIME**:
+
+   First, present findings and the main design question:
    ```
    Based on my research, here's what I found:
 
@@ -169,37 +201,57 @@ After getting initial clarifications:
    - [Key discovery about existing code]
    - [Pattern or convention to follow]
 
-   **Design Options:**
-   1. [Option A] - [pros/cons]
-   2. [Option B] - [pros/cons]
+   **[Technical] Design Q1 of N: Which overall approach should we use?**
 
-   **Open Questions:**
-   - [Technical uncertainty]
-   - [Design decision needed]
+   1. [Option A] — [pros/cons]
+   2. [Option B] — [pros/cons]
+   3. [Option C] — [pros/cons]
+   4. [Option D] — [pros/cons]
+   5. Other / hybrid — please describe your preferred approach
 
-   Which approach aligns best with your vision?
+   > **My recommendation: Option X** — [Detailed reasoning comparing this option to the others, including specific trade-offs found in the codebase]
    ```
+
+   After the user answers, continue with each remaining open question individually, one at a time. Classify each as `[Technical]` or `[Business Logic]` — ask all technical questions first, then business logic ones. Each question must include a recommendation with reasoning:
+   ```
+   **[Business Logic] Q1 of M: [Business logic uncertainty]**
+
+   1. [Option A] — [brief reason]
+   2. [Option B] — [brief reason]
+   3. [Option C] — [brief reason]
+   4. [Option D] — [brief reason]
+   5. Other / please describe
+
+   > **My recommendation: Option X** — [Detailed reasoning]
+   ```
+
+   - **CRITICAL**: Only show ONE question at a time. Wait for the user to answer before presenting the next.
+   - Always provide at least 4 options (plus an open-ended fallback) for every design decision or open question.
+   - Always include a recommendation with clear reasoning comparing the suggested option against the alternatives.
 
 ### Step 3: Plan Structure Development
 
 Once aligned on approach:
 
-1. **Create initial plan outline**:
+1. **Create initial plan outline** and present ONE structural question:
    ```
    Here's my proposed plan structure:
 
    ## Overview
    [1-2 sentence summary]
 
-   ## Implementation Phases:
-   1. [Phase name] - [what it accomplishes]
-   2. [Phase name] - [what it accomplishes]
-   3. [Phase name] - [what it accomplishes]
+   **[Technical] Structure Q: How should we phase the implementation?**
 
-   Does this phasing make sense? Should I adjust the order or granularity?
+   1. [Recommended phasing] — [what each phase accomplishes and why this order makes sense]
+   2. Merge phases 1 & 2 into a single setup phase, then split phase 3 — better if [reason]
+   3. Tackle phases in reverse order (UI-first) — better if [reason]
+   4. Single large phase with feature flags to gate incomplete work — better if [reason]
+   5. Other — please describe your preferred structure
+
+   > **My recommendation: Option 1** — [Detailed reasoning comparing this phasing to the alternatives, referencing risk, testability, and codebase constraints]
    ```
 
-2. **Get feedback on structure** before writing details
+2. **Wait for the user's choice** before writing any plan details
 
 ### Step 4: Detailed Plan Writing
 
@@ -347,6 +399,10 @@ After structure approval:
    - Get buy-in at each major step
    - Allow course corrections
    - Work collaboratively
+   - **ALWAYS ask ONE question at a time** — never present two or more questions simultaneously. Wait for the user's answer before showing the next question.
+   - **ALWAYS offer at least 4 plausible options** when asking the user any question — never ask an open-ended question without providing multiple concrete choices. Include an "Other / tell me more" option as a fallback so the user can still go off-script.
+   - **ALWAYS include a recommendation** after the options (e.g., `> **My recommendation: Option X** — [reason comparing it to the other options]`). The reason must reference specific codebase findings, trade-offs, or business context.
+   - **Classify every question** as either `[Technical]` or `[Business Logic]` — ask all technical questions before business logic ones.
 
 3. **Be Thorough**:
    - Read all context files COMPLETELY before planning

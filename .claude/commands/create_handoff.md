@@ -38,6 +38,7 @@ status: complete
 last_updated: [Current date in YYYY-MM-DD format]
 last_updated_by: [Researcher name]
 type: implementation_strategy
+plan_path: [Path to the plan being implemented, e.g. thoughts/shared/plans/my-plan.md — omit this field if no plan is being implemented]
 ---
 
 # Handoff: ENG-XXXX {very concise description}

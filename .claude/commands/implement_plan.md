@@ -16,7 +16,13 @@ When given a plan path:
 - Create a todo list to track your progress
 - Start implementing if you understand what needs to be done
 
-If no plan path provided, ask for one.
+When given a handoff document path instead of a plan path:
+- Read the handoff document first
+- **MANDATORY**: Locate the `plan_path` field in the handoff metadata — you MUST read the full plan at that path before doing anything else
+- The handoff provides session context (what was done, what's next), but the **plan is the authoritative source of truth** for implementation details, phases, and success criteria
+- After reading both the handoff and the plan, proceed as if you had been given the plan path directly, picking up from where the handoff left off
+
+If no plan path or handoff provided, ask for one.
 
 ## Branch Selection (MANDATORY - Before Any Implementation)
 
@@ -335,6 +341,8 @@ When something isn't working as expected:
 Use sub-tasks sparingly - mainly for targeted debugging or exploring unfamiliar territory.
 
 ## Resuming Work
+
+If resuming from a handoff document, you **MUST** read the plan referenced in the handoff's `plan_path` field before doing anything else. Do not rely solely on the handoff summary — the plan is the authoritative implementation guide.
 
 If the plan has existing checkmarks:
 - Trust that completed work is done

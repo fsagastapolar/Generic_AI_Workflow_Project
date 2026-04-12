@@ -90,7 +90,7 @@ Then wait for the user's input.
 
    These agents will:
    - Find relevant source files, configs, and tests
-   - Identify the specific directories to focus on (e.g., if WUI is mentioned, they'll focus on humanlayer-wui/)
+   - Identify the specific directories to focus on (e.g., frontend, backend, specific services)
    - Trace data flow and key functions
    - Return detailed explanations with file:line references
 

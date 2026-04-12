@@ -12,17 +12,16 @@ You are tasked with creating detailed implementation plans through an interactiv
 Before creating any implementation plan, read and understand the project guidelines at `.claude/project_guidelines.md`. These guidelines are CRITICAL and must be incorporated into your plan:
 
 **Key Guidelines to Follow:**
-- **Git Workflow**: Always branch from `develop`, never commit directly to main/develop
-- **Docker Environment**: Backend MUST run in Docker (`app` service), never locally
-- **Database**: MySQL ONLY via Docker (`mysql` service), NEVER SQLite
+- **Git Workflow**: Follow the branching strategy defined in project guidelines
+- **Environment**: Follow the execution environment rules (Docker, local, etc.)
+- **Database**: Use only the database specified in project guidelines
 - **Testing**: All changes require tests, never modify tests to hide bugs
 - **Manual Testing**: Plans must include manual testing steps for the testing guide
 - **FrontEnd Testing**: Only for plans that include frontend changes
 
 **Incorporate these into your plan**:
-- Include proper git workflow steps (create branch from develop)
-- Specify Docker commands for backend operations (using `app` or `mysql` services)
-- Never suggest SQLite for any purpose
+- Include proper git workflow steps (branch creation per project guidelines)
+- Specify environment-appropriate commands for backend operations
 - Include comprehensive test requirements in success criteria
 - Plan for manual testing documentation to be created after implementation, the output format should be a md file to be stored in the thoughts/shared/testing directory
 - If the plan includes **API/backend modifications**, include a step to create an API E2E testing guide (after implementation) using the `e2e-test-guide-creator` agent. The guide will be stored in `thoughts/shared/e2e-test-guides/` and should include:
@@ -33,13 +32,13 @@ Before creating any implementation plan, read and understand the project guideli
   - Entity creation steps when seeded data is insufficient
   - Edge case testing scenarios (validation errors, authorization failures)
   - **Note**: During implementation, the `e2e-test-guide-creator` agent will be invoked as a Task to generate these comprehensive API test guides
-- If the plan includes **frontend modifications**, include a step to create a frontend E2E testing guide (after implementation) for the `angular-tester` agent. The guide should:
-  - Document specific user flows and test scenarios for the `angular-tester` agent to execute
+- If the plan includes **frontend modifications**, include a step to create a frontend E2E testing guide (after implementation) for the appropriate frontend tester agent (e.g., `angular-tester`, `react-tester`, or `vue-tester`). The guide should:
+  - Document specific user flows and test scenarios for the tester agent to execute
   - List all `data-testid` attributes that must be added to components for reliable test selection (highest priority selector)
   - Include setup prerequisites (target URLs, test data, mock credentials if applicable)
   - Specify expected outcomes and verification points for each test scenario
-  - Follow the angular-tester's Research-Plan-Execute workflow structure (Navigate → Snapshot → Interact → Verify)
-  - **Note**: During implementation, the `angular-tester` agent will be invoked as a Task to execute these tests (keeping Playwright tools isolated from the main context)
+  - Follow the tester agent's Research-Plan-Execute workflow structure (Navigate → Snapshot → Interact → Verify)
+  - **Note**: During implementation, the appropriate tester agent will be invoked as a Task to execute these tests (keeping Playwright tools isolated from the main context)
 
 **IMPORTANT**: If the plan contradicts these guidelines, STOP and revise it before presenting to the user.
 
@@ -63,8 +62,8 @@ Please provide:
 
 I'll analyze this information and work with you to create a comprehensive plan.
 
-Tip: You can also invoke this command with a ticket file directly: `/create_plan thoughts/allison/tickets/eng_1234.md`
-For deeper analysis, try: `/create_plan think deeply about thoughts/allison/tickets/eng_1234.md`
+Tip: You can also invoke this command with a ticket file directly: `/create_plan thoughts/shared/tickets/eng_1234.md`
+For deeper analysis, try: `/create_plan think deeply about thoughts/shared/tickets/eng_1234.md`
 ```
 
 Then wait for the user's input.
@@ -74,7 +73,7 @@ Then wait for the user's input.
 ### Step 1: Context Gathering & Initial Analysis
 
 1. **Read all mentioned files immediately and FULLY**:
-   - Ticket files (e.g., `thoughts/allison/tickets/eng_1234.md`)
+   - Ticket files (e.g., `thoughts/shared/tickets/eng_1234.md`)
    - Research documents
    - Related implementation plans
    - Any JSON/data files mentioned
@@ -359,7 +358,7 @@ After structure approval:
 
 ## References
 
-- Original ticket: `thoughts/allison/tickets/eng_XXXX.md`
+- Original ticket: `thoughts/shared/tickets/eng_XXXX.md`
 - Related research: `thoughts/shared/research/[relevant].md`
 - Similar implementation: `[file:line]`
 ````
@@ -526,7 +525,7 @@ tasks = [
 User: /create_plan
 Assistant: I'll help you create a detailed implementation plan...
 
-User: We need to add parent-child tracking for Claude sub-tasks. See thoughts/allison/tickets/eng_1478.md
+User: We need to add parent-child tracking for sub-tasks. See thoughts/shared/tickets/eng_1478.md
 Assistant: Let me read that ticket file completely first...
 
 [Reads file fully]

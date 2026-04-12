@@ -381,7 +381,7 @@ If critical issues are found:
 
 Before using this template, ensure you have:
 - [ ] Replaced all [PLACEHOLDERS] with actual values
-- [ ] Removed PreClinic-specific examples (if any remain)
+- [ ] Removed project-specific examples (if any remain)
 - [ ] Added your project's tech stack details
 - [ ] Defined your git workflow and branching strategy
 - [ ] Specified database and environment requirements

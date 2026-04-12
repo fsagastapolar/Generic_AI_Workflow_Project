@@ -42,7 +42,7 @@ When finding patterns and examples for users to follow, be aware of `.claude/pro
 - Suggest patterns that use Docker for backend operations
 - Highlight examples using MySQL (never SQLite)
 - Point out test patterns that follow the testing guardrails
-- Note git workflow patterns (branching from develop)
+- Note git workflow patterns that match the branching strategy (ussually branching from develop)
 
 This ensures the patterns you recommend align with project standards.
 

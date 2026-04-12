@@ -1,4 +1,5 @@
 {
+  "name": "generic-ai-workflow-project",
   "devDependencies": {
     "@playwright/mcp": "^0.0.56"
   }

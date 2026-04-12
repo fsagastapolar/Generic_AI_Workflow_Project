@@ -43,11 +43,11 @@ For each test scenario, provide:
 ```markdown
 ## Prerequisites
 - [ ] Docker containers running: `docker ps`
-- [ ] Backend container: `pre-clinic-backend-app-1`
-- [ ] Database container: `pre-clinic-mysql-1`
-- [ ] Database migrated: `docker exec pre-clinic-backend-app-1 php artisan migrate`
-- [ ] Database seeded: `docker exec pre-clinic-backend-app-1 php artisan db:seed`
-- [ ] Backend API: http://localhost:8000
+- [ ] Backend container: `{backend-container-name}`
+- [ ] Database container: `{database-container-name}`
+- [ ] Database migrated: `docker exec {backend-container-name} {migration-command}`
+- [ ] Database seeded: `docker exec {backend-container-name} {seed-command}`
+- [ ] Backend API: http://localhost:{port}
 ```
 
 #### b) Authentication Setup
@@ -125,7 +125,7 @@ curl -X POST http://localhost:8000/api/v1/medical-history/entries/10/annotations
 
 **Verify in Database**:
 ```bash
-docker exec pre-clinic-mysql-1 mysql -u root -ppassword clinic_db -e \
+docker exec {database-container-name} {db-cli-command} {database-name} -e \
   "SELECT id, content, created_by, is_edited FROM annotations WHERE id = 45;"
 ```
 
@@ -174,7 +174,7 @@ curl -X GET http://localhost:8000/api/v1/patients/$PATIENT_ID/history \
 
 **Cleanup (Optional)**:
 ```bash
-docker exec pre-clinic-mysql-1 mysql -u root -ppassword clinic_db -e \
+docker exec {database-container-name} {db-cli-command} {database-name} -e \
   "DELETE FROM patients WHERE id = 99;"
 ```
 ```
@@ -183,23 +183,23 @@ docker exec pre-clinic-mysql-1 mysql -u root -ppassword clinic_db -e \
 Since everything runs in Docker:
 
 - **Backend commands**: Always use `docker exec {backend-container-name}`
-- **Database queries**: Always use `docker exec {mysql-container-name} mysql ...`
+- **Database queries**: Always use `docker exec {database-container-name} {db-cli-command} ...`
 - **Localhost access**: Document when curl can hit `http://localhost:port`
 - **Container networking**: Note when containers need to communicate internally
 
 Examples:
 ```bash
-# Run backend artisan command
-docker exec pre-clinic-backend-app-1 php artisan cache:clear
+# Run backend command
+docker exec {backend-container-name} {example-command}
 
 # Query database
-docker exec pre-clinic-mysql-1 mysql -u root -ppassword clinic_db -e "SELECT * FROM users LIMIT 5;"
+docker exec {database-container-name} {db-cli-command} {database-name} -e "SELECT * FROM users LIMIT 5;"
 
 # View backend logs
-docker logs pre-clinic-backend-app-1 --tail 50
+docker logs {backend-container-name} --tail 50
 
 # Access backend shell
-docker exec -it pre-clinic-backend-app-1 bash
+docker exec -it {backend-container-name} bash
 ```
 
 ### 5. Research Strategy
@@ -349,8 +349,8 @@ Use to find similar patterns:
 ❌ "Create a test user": Vague instruction
 ✅ Complete API call with body to create user, then use returned ID
 
-❌ Local commands: `php artisan migrate`
-✅ Docker commands: `docker exec pre-clinic-backend-app-1 php artisan migrate`
+❌ Local commands: `{framework-cli-command}`
+✅ Docker commands: `docker exec {backend-container-name} {framework-cli-command}`
 
 ## When Auth Tokens Cannot Be Persisted
 

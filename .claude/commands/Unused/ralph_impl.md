@@ -8,9 +8,9 @@ model: sonnet
 Before implementing any changes, read and follow the project guidelines at `.claude/project_guidelines.md`. These guidelines cover:
 - **Git Workflow**: Branch from `develop`, create PRs for review
 - **Docker Environment**: Run all backend operations in Docker containers
-  - Laravel/PHP: `docker exec -it preclinic-app <command>`
-  - MySQL: `docker exec -it preclinic-mysql <command>`
-- **Database**: MySQL ONLY, NEVER SQLite or other databases
+  - Backend: `docker exec -it {backend-container-name} <command>`
+  - Database: `docker exec -it {database-container-name} <command>`
+- **Database**: Use only the database specified in project guidelines
 - **Testing**: Create/update tests for all changes, never modify tests to hide bugs
 - **Manual Testing**: Create testing guide at `thoughts/shared/testing/YYYY-MM-DD-manual-test-guide.md`
 

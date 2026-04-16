@@ -50,6 +50,11 @@
       "model": "zai-coding-plan/glm-5.1",
       "hidden": true
     },
+    "plan-reviewer": {
+      "description": "Ruthlessly reviews implementation plans before execution — scores, roasts, and provides fix recommendations",
+      "mode": "subagent",
+      "model": "zai-coding-plan/glm-5.1"
+    },
     "plan-validator": {
       "description": "Validates that an implementation matches its plan",
       "mode": "subagent",

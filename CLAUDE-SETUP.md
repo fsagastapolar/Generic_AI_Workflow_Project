@@ -38,12 +38,13 @@ If you need to add additional MCP servers, always install them as project depend
 
 ```bash
 # Install MCP servers as dev dependencies (local to project)
-npm install --save-dev @mseep/linear-mcp-server
 npm install --save-dev @playwright/mcp
 # Add other MCP servers as needed
 ```
 
 **Never install MCP servers globally** (avoid `npm install -g`). This ensures all team members use the same versions and configurations.
+
+**Note**: Linear integration uses direct GraphQL API calls via `curl` (no MCP server needed). See `.env.example` for required `LINEAR_API_KEY`.
 
 ### 3. Claude Configuration Files
 
@@ -78,16 +79,22 @@ This file contains merged MCP configurations. Update it with:
 #### `settings.local.json` (Optional)
 Use this file for local overrides of settings without modifying the committed `settings.json`.
 
-### 5. Environment Variables (If Applicable)
+### 5. Environment Variables
 
-If the project uses environment variables, create your local `.env` file:
+Create your local `.env` file:
 
 ```bash
 # In project root
 cp .env.example .env
 ```
 
-Then edit `.env` with your actual values.
+Edit `.env` with your actual values. Required for Linear integration:
+
+- **`LINEAR_API_KEY`** — Generate at https://linear.app/settings/api
+- **`LINEAR_TEAM_ID`** — Your team's UUID (find via API, see `.env.example`)
+- **`LINEAR_PROJECT_ID`** (optional) — Default project for new tickets
+
+Without these, all commands work normally but without Linear ticket tracking.
 
 ## Configuration File Structure
 
@@ -98,15 +105,6 @@ When configuring MCP servers, always reference the **local installation** in `no
 ```json
 {
   "mcpServers": {
-    "linear": {
-      "command": "node",
-      "args": [
-        "node_modules/@mseep/linear-mcp-server/dist/index.js"
-      ],
-      "env": {
-        "LINEAR_API_KEY": "your-linear-api-key-here"
-      }
-    },
     "playwright": {
       "command": "node",
       "args": [
@@ -132,7 +130,6 @@ After setup, verify your configuration:
 4. Verify MCP servers are installed locally:
    ```bash
    # Check if MCP servers are in node_modules
-   ls node_modules/@mseep/linear-mcp-server
    ls node_modules/@playwright/mcp
    ```
 5. Test that Git doesn't track your configuration files:
@@ -148,13 +145,12 @@ To verify MCP servers are working correctly:
 1. **Check server paths**: Ensure paths in your `mcp_config.json` point to existing files:
    ```bash
    # Verify server files exist
-   test -f node_modules/@mseep/linear-mcp-server/dist/index.js && echo "Linear MCP Server found" || echo "Linear MCP Server NOT found"
    test -f node_modules/@playwright/mcp/dist/index.js && echo "Playwright MCP found" || echo "Playwright MCP NOT found"
    ```
 
 2. **Test server execution**: Try running a server manually to check for errors:
    ```bash
-   node node_modules/@mseep/linear-mcp-server/dist/index.js --help
+   node node_modules/@playwright/mcp/dist/index.js --help
    ```
 
 3. **Claude Integration**: Open Claude and verify the MCP servers appear in the available tools/context
@@ -188,13 +184,12 @@ If Claude can't find an MCP server:
 
 1. **Verify installation**:
    ```bash
-   npm list @mseep/linear-mcp-server
    npm list @playwright/mcp
    ```
 
 2. **Reinstall if missing**:
    ```bash
-   npm install --save-dev @mseep/linear-mcp-server
+   npm install --save-dev @playwright/mcp
    ```
 
 3. **Check path in config**: Ensure `mcp_config.json` uses the correct path:
@@ -209,7 +204,7 @@ If an MCP server fails to start:
 1. **Check API keys**: Verify environment variables are set correctly in `mcp_config.json`
 2. **Test manually**: Run the server directly:
    ```bash
-   LINEAR_API_KEY="your-key" node node_modules/@mseep/linear-mcp-server/dist/index.js
+   node node_modules/@playwright/mcp/dist/index.js
    ```
 3. **Check permissions**: Ensure the server files are executable
 4. **Review logs**: Look for error messages in Claude's MCP server logs
@@ -220,11 +215,10 @@ If you previously installed MCP servers globally:
 
 ```bash
 # Uninstall global packages (optional but recommended)
-npm uninstall -g @mseep/linear-mcp-server
 npm uninstall -g @playwright/mcp
 
 # Ensure local installation
-npm install --save-dev @mseep/linear-mcp-server @playwright/mcp
+npm install --save-dev @playwright/mcp
 ```
 
 Update your `mcp_config.json` to use `node` with local paths instead of `npx` with global packages.

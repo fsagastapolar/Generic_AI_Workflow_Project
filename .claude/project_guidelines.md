@@ -377,6 +377,53 @@ If critical issues are found:
 
 ---
 
+## Linear Integration (Optional)
+
+This project supports Linear integration for ticket tracking. When configured, AI agents will automatically:
+
+- **Detect Linear references** in commands (ticket identifiers, URLs)
+- **Fetch ticket details** to use as context for planning
+- **Track implementation progress** by posting comments on Linear issues
+- **Transition ticket states** through the standard workflow: In Progress → Validation → QA → Done
+
+### Setup
+
+1. Copy `.env.example` to `.env` and fill in your Linear credentials:
+   - `LINEAR_API_KEY` — Generate at https://linear.app/settings/api
+   - `LINEAR_TEAM_ID` — Find via the API (instructions in `.env.example`)
+   - `LINEAR_PROJECT_ID` (optional) — Default project for new tickets
+
+2. Verify setup:
+   ```bash
+   source .env
+   curl -s -X POST https://api.linear.app/graphql \
+     -H "Authorization: $LINEAR_API_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{"query":"{ teams { nodes { id name key } } }"}' | jq .
+   ```
+
+### Workflow States
+
+The standard workflow assumes these Linear states exist in your team:
+- **Backlog** → **Todo** → **In Progress** → **Validation** → **QA** → **Done**
+
+If your team uses different state names, the agents will discover them dynamically via the API.
+
+### Agent Reference
+
+- **`linear-manager`** — Create, update, comment, and transition tickets (read-write)
+- **`linear-searcher`** — Search and fetch ticket details (read-only)
+
+### Usage in Commands
+
+- `/create_plan TEAM-123` — Auto-fetches ticket and includes it in the plan
+- `/implement_plan path/to/plan.md` — Auto-tracks progress on the linked Linear issue
+- `/validate_plan path/to/plan.md` — Posts validation results and moves to QA
+
+If no Linear reference is provided or `.env` is not configured, all commands work normally without Linear tracking.
+
+---
+
 ## Template Customization Checklist
 
 Before using this template, ensure you have:
@@ -387,5 +434,6 @@ Before using this template, ensure you have:
 - [ ] Specified database and environment requirements
 - [ ] Listed required tools and versions
 - [ ] Added domain-specific guidelines (security, compliance, etc.)
+- [ ] Configured Linear integration (optional — see Linear Integration section above)
 - [ ] Removed this checklist section
 - [ ] Removed the template instructions comment at the top

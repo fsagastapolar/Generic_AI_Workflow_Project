@@ -9,7 +9,26 @@ You are tasked with creating detailed implementation plans through an interactiv
 
 ## Project Guidelines (MANDATORY)
 
-Before creating any implementation plan, read and understand the project guidelines at `.claude/project_guidelines.md`. These guidelines are CRITICAL and must be incorporated into your plan.
+Before creating any implementation plan, read and understand the project guidelines at `.claude/project_guidelines.md`. These guidelines are CRITICAL and must be incorporated into your plan:
+
+**Key Guidelines to Follow:**
+- **Git Workflow**: Always branch from `develop`, never commit directly to main/develop
+- **Docker Environment**: Backend MUST run in Docker (`api` service), never locally
+- **Database**: PostgreSQL ONLY via Docker (`db` service), NEVER SQLite or MySQL
+- **Testing**: All changes require tests, never modify tests to hide bugs
+- **Manual Testing**: Plans must include manual testing steps for the testing guide
+- **FrontEnd Testing**: Only for plans that include frontend changes
+
+**Incorporate these into your plan**:
+- Include proper git workflow steps (create branch from develop)
+- Specify Docker commands for backend operations (using `api` or `db` services)
+- Never suggest SQLite or MySQL for any purpose — PostgreSQL only
+- Include comprehensive test requirements in success criteria
+- Plan for manual testing documentation to be created after implementation, the output format should be a md file to be stored in the thoughts/shared/testing directory
+- If the plan includes **API/backend modifications**, include a step to create an API E2E testing guide (after implementation) using the `e2e-test-guide-creator` agent. The guide will be stored in `thoughts/shared/e2e-test-guides/`
+- If the plan includes **frontend modifications**, include a step to create a frontend E2E testing guide (after implementation) for the `react-tester` agent
+
+**IMPORTANT**: If the plan contradicts these guidelines, STOP and revise it before presenting to the user.
 
 ## Code Quality
 - Prefer correct, complete implementations over minimal ones.
@@ -21,13 +40,13 @@ Before creating any implementation plan, read and understand the project guideli
 
 Whenever you receive input (parameters or user messages), **automatically scan for Linear references**:
 
-- **Identifiers**: `TEAM-123`, `team-42`, `TEAM 15` (case-insensitive, with hyphen or space)
-- **URLs**: `https://linear.app/.../issue/TEAM-123/...`
+- **Identifiers**: `POL-123`, `pol-42`, `POL 15` (case-insensitive, with hyphen or space)
+- **URLs**: `https://linear.app/polarcodeconsulting/issue/POL-123/...`
 
 If any Linear references are detected:
 1. **Immediately spawn a `linear-searcher` agent** to fetch the full ticket details
 2. Use the fetched data as primary context for the plan — treat it like reading a ticket file
-3. Also search for related tickets (similar keywords) to understand the broader context
+3. Also search for related tickets (same epic, similar keywords) to understand the broader context
 4. Embed the Linear data into the plan's `## Linear Integration` section
 
 If no Linear references are detected, proceed normally. You can also ask the user if there's an associated Linear ticket.
@@ -38,7 +57,7 @@ When this command is invoked:
 
 1. **Check if parameters were provided**:
    - If a file path or ticket reference was provided as a parameter, skip the default message
-   - If a Linear identifier (e.g. `TEAM-123`) or URL is detected, immediately fetch the ticket via `linear-searcher` agent
+   - If a Linear identifier (e.g. `POL-123`) or URL is detected, immediately fetch the ticket via `linear-searcher` agent
    - Immediately read any provided files FULLY
    - Begin the research process
 
@@ -48,15 +67,15 @@ I'll help you create a detailed implementation plan. Let me start by understandi
 
 Please provide:
 1. The task/ticket description (or reference to a ticket file)
-2. A Linear ticket reference (e.g. TEAM-123) or URL — I'll auto-fetch the details
+2. A Linear ticket reference (e.g. POL-123) or URL — I'll auto-fetch the details
 3. Any relevant context, constraints, or specific requirements
 4. Links to related research or previous implementations
 
 I'll analyze this information and work with you to create a comprehensive plan.
 
-Tip: You can also invoke this command with a Linear ticket directly: `/create_plan TEAM-123`
+Tip: You can also invoke this command with a Linear ticket directly: `/create_plan POL-123`
 Or with a ticket file: `/create_plan thoughts/allison/tickets/eng_1234.md`
-For deeper analysis, try: `/create_plan think deeply about TEAM-123`
+For deeper analysis, try: `/create_plan think deeply about POL-123`
 ```
 
 Then wait for the user's input.
@@ -73,7 +92,6 @@ When spawning any of the following agents, you MUST use the fallback strategy be
 - `thoughts-analyzer`
 - `research-gatherer`
 - `plan-writer`
-- `linear-searcher`
 
 ### How to dispatch a research agent:
 
@@ -190,7 +208,6 @@ Spawn the `plan-writer` agent (via dispatch protocol) with:
 - Scope (IN/OUT)
 - Phasing from Step 4
 - Project guidelines summary
-- **Linear data** (if detected): Issue details, UUID, identifier, title, acceptance criteria
 - Target file path: `thoughts/shared/plans/YYYY-MM-DD-ENG-XXXX-description.md`
 
 The agent will write the complete plan document.

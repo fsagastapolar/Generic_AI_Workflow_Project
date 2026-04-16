@@ -47,39 +47,30 @@ Read the plan file and extract:
 source "$(git rev-parse --show-toplevel)/.env"
 ```
 
-### Workflow State Resolution
-State UUIDs are workspace-specific. Resolve them dynamically:
-```bash
-curl -s -X POST https://api.linear.app/graphql \
-  -H "Authorization: $LINEAR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"query": "query { team(id: \"'$LINEAR_TEAM_ID'\") { states { nodes { id name type } } } }"}' | jq '.data.team.states.nodes[] | "\(.name) → \(.id)"'
-```
+### Workflow State IDs
+| State | UUID |
+|-------|------|
+| Backlog | `ede82dc1-8ac8-45db-8753-ff7053cb1f32` |
+| Todo | `32e4e542-4e38-4007-99a8-f231fc72252c` |
+| In Progress | `1326b289-e1eb-42ec-a56e-b6ccd4f2ef07` |
+| Validation | `13b70be1-d529-44e1-9211-074684f64d4e` |
+| QA | `0469be23-da73-4338-a9d0-af98548139cb` |
+| Done | `be2ecbee-6346-47e0-92c4-7623a842edfb` |
+| Canceled | `a4e0cf62-9b0a-422c-8392-a785521567c4` |
+| Duplicate | `577ff3fa-ad90-4974-b337-f5240f1e51f7` |
 
 ### Linear API Patterns
-**Move ticket:** Use the resolved state UUID:
-```bash
-curl -s -X POST https://api.linear.app/graphql \
-  -H "Authorization: $LINEAR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"query":"mutation IssueUpdate($id:String!,$input:IssueUpdateInput!){issueUpdate(id:$id,input:$input){success issue{identifier state{name}}}}","variables":{"id":"ISSUE_UUID","input":{"stateId":"STATE_UUID"}}}' | jq .
-```
+**Move ticket:** `curl -s -X POST https://api.linear.app/graphql -H "Authorization: $LINEAR_API_KEY" -H "Content-Type: application/json" -d '{"query":"mutation IssueUpdate($id:String!,$input:IssueUpdateInput!){issueUpdate(id:$id,input:$input){success issue{identifier state{name}}}}","variables":{"id":"ISSUE_UUID","input":{"stateId":"STATE_UUID"}}}' | jq .`
 
-**Add comment:**
-```bash
-curl -s -X POST https://api.linear.app/graphql \
-  -H "Authorization: $LINEAR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"query":"mutation CommentCreate($input:CommentCreateInput!){commentCreate(input:$input){success}}","variables":{"input":{"issueId":"ISSUE_UUID","body":"COMMENT"}}}' | jq .
-```
+**Add comment:** `curl -s -X POST https://api.linear.app/graphql -H "Authorization: $LINEAR_API_KEY" -H "Content-Type: application/json" -d '{"query":"mutation CommentCreate($input:CommentCreateInput!){commentCreate(input:$input){success}}","variables":{"input":{"issueId":"ISSUE_UUID","body":"COMMENT"}}}' | jq .`
 
 **Do not let Linear API failures block validation.**
 
 ### Determine AI Model Identity
 
 Identify the current AI model and include it in all Linear comments:
-- **If running as Claude** (via Task tool fallback): Report as `Claude` with the specific model if known
-- **If running as OpenCode/GLM**: Report as `GLM-5.1` or the model from the command's frontmatter
+- **If running as Claude** (via Task tool fallback): Report as `Claude` with the specific model if known (e.g., `Claude Sonnet 4`, `Claude Opus 4`)
+- **If running as OpenCode/GLM**: Report as `GLM-5.1` or the model from the command's frontmatter `model` field
 
 ## Step 2: Determine Scope
 

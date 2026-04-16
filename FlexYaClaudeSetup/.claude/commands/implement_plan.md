@@ -18,7 +18,7 @@ You are tasked with implementing an approved technical plan from `thoughts/share
 
 When spawning any of the following agents, try the cheaper OpenCode agent first; fall back to Claude if it fails:
 
-**Agents with OpenCode counterparts:** `phase-executor`, `testing-guide-orchestrator`, `e2e-test-guide-creator`, `linear-manager`
+**Agents with OpenCode counterparts:** `phase-executor`, `testing-guide-orchestrator`, `e2e-test-guide-creator`
 
 ```bash
 TMPFILE=$(mktemp /tmp/opencode_dispatch_XXXXXX.json)
@@ -58,42 +58,31 @@ If the plan contains a `## Linear Integration` section with an Issue UUID, Linea
 source "$(git rev-parse --show-toplevel)/.env"
 ```
 
-### Workflow State Resolution
-State UUIDs are workspace-specific. Resolve them dynamically:
-```bash
-curl -s -X POST https://api.linear.app/graphql \
-  -H "Authorization: $LINEAR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"query": "query { team(id: \"'$LINEAR_TEAM_ID'\") { states { nodes { id name type } } } }"}' | jq '.data.team.states.nodes[] | "\(.name) → \(.id)"'
-```
-
-Cache the state name→UUID mapping for the session.
+### Workflow State IDs
+| State | UUID |
+|-------|------|
+| Backlog | `ede82dc1-8ac8-45db-8753-ff7053cb1f32` |
+| Todo | `32e4e542-4e38-4007-99a8-f231fc72252c` |
+| In Progress | `1326b289-e1eb-42ec-a56e-b6ccd4f2ef07` |
+| Validation | `13b70be1-d529-44e1-9211-074684f64d4e` |
+| QA | `0469be23-da73-4338-a9d0-af98548139cb` |
+| Done | `be2ecbee-6346-47e0-92c4-7623a842edfb` |
+| Canceled | `a4e0cf62-9b0a-422c-8392-a785521567c4` |
+| Duplicate | `577ff3fa-ad90-4974-b337-f5240f1e51f7` |
 
 ### State Transitions
-**On start** (after branch selection): Move to **In Progress**, comment: `🤖 **AI Implementation Log** — Implementation started on branch \`<branch>\`. Plan: \`<path>\``
+**On start** (after branch selection): Move to **In Progress**, comment: `🤖 **Claude Implementation Log** — Implementation started on branch \`<branch>\`. Plan: \`<path>\``
 
-**After each phase**: Comment: `🤖 **AI Implementation Log** — Phase N: [Name] completed. [Summary]`
+**After each phase**: Comment: `🤖 **Claude Implementation Log** — Phase N: [Name] completed. [Summary]`
 
-**On difficulties**: Comment: `🤖 **AI Implementation Log** — ⚠️ [Description]. [Resolution]`
+**On difficulties**: Comment: `🤖 **Claude Implementation Log** — ⚠️ [Description]. [Resolution]`
 
-**On complete**: Move ticket to **Validation**, comment: `🤖 **AI Implementation Log** — All phases completed. Implementation moving to AI validation. Summary: [brief summary of what was implemented]`
+**On complete**: Move ticket to **Validation**, comment: `🤖 **Claude Implementation Log** — All phases completed. Implementation moving to AI validation. Summary: [brief summary of what was implemented]`
 
 ### API Patterns
-**Move ticket:** Use the resolved state UUID:
-```bash
-curl -s -X POST https://api.linear.app/graphql \
-  -H "Authorization: $LINEAR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"query":"mutation IssueUpdate($id:String!,$input:IssueUpdateInput!){issueUpdate(id:$id,input:$input){success issue{identifier state{name}}}}","variables":{"id":"ISSUE_UUID","input":{"stateId":"STATE_UUID"}}}' | jq .
-```
+**Move ticket:** `curl -s -X POST https://api.linear.app/graphql -H "Authorization: $LINEAR_API_KEY" -H "Content-Type: application/json" -d '{"query":"mutation IssueUpdate($id:String!,$input:IssueUpdateInput!){issueUpdate(id:$id,input:$input){success issue{identifier state{name}}}}","variables":{"id":"ISSUE_UUID","input":{"stateId":"STATE_UUID"}}}' | jq .`
 
-**Add comment:**
-```bash
-curl -s -X POST https://api.linear.app/graphql \
-  -H "Authorization: $LINEAR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"query":"mutation CommentCreate($input:CommentCreateInput!){commentCreate(input:$input){success}}","variables":{"input":{"issueId":"ISSUE_UUID","body":"COMMENT"}}}' | jq .
-```
+**Add comment:** `curl -s -X POST https://api.linear.app/graphql -H "Authorization: $LINEAR_API_KEY" -H "Content-Type: application/json" -d '{"query":"mutation CommentCreate($input:CommentCreateInput!){commentCreate(input:$input){success}}","variables":{"input":{"issueId":"ISSUE_UUID","body":"COMMENT"}}}' | jq .`
 
 **Do not let Linear API failures block implementation.**
 
@@ -161,13 +150,20 @@ If the plan includes both backend and frontend phases, **pause before any fronte
 
 ---
 
-## Frontend E2E Testing (CONDITIONAL)
+## Frontend E2E Testing with react-tester (CONDITIONAL)
 
 If frontend changes were made and an E2E testing guide exists, ask the user:
-- **Run automated E2E tests** → invoke the appropriate tester agent via Task tool
+- **Run automated E2E tests** → invoke `react-tester` via Task tool
 - **Skip, I'll test manually**
 
-**Never invoke Playwright tools directly** — always delegate to tester agents via Task tool.
+Before invoking, **rebuild the frontend container**:
+```bash
+docker compose build web && docker compose up -d web
+```
+
+Invoke as Task with `subagent_type: "react-tester"`, passing the test guide path. Include cache-busting instructions in the prompt.
+
+**Never invoke Playwright tools directly** — always delegate to `react-tester` via Task tool.
 
 ---
 
@@ -182,6 +178,8 @@ If yes, invoke the `testing-guide-orchestrator` agent (via dispatch protocol) wi
 - Files changed (from `git diff`)
 - Plan reference
 
+The agent will classify the implementation type and delegate to the right specialist agents.
+
 ---
 
 ## Linear Finalization
@@ -193,7 +191,7 @@ If Linear tracking is active, move ticket to **Validation** status and post a co
 ## Stop & Handoff Flow (At Any Planned Stop Point)
 
 Offer to create a handoff document:
-- **Yes, create a handoff** → invoke `create_handoff` command
+- **Yes, create a handoff** → invoke `create_handoff` skill
 - **No, just stop**
 
 Present a clear summary of what was completed and what remains.

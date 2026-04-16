@@ -9,6 +9,7 @@
       "Write",
       "Bash(curl -s -X POST https://api.linear.app/graphql*)",
       "Bash(source */.env*curl*https://api.linear.app/graphql*)",
+      "Bash(docker compose:*)",
       "Bash(git branch:*)",
       "Bash(git log:*)",
       "Bash(git status:*)",
@@ -19,14 +20,26 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git check-ignore:*)",
+      "Bash(gh pr:*)",
+      "Bash(python3:*)",
+      "Bash(node:*)",
       "Bash(jq:*)",
+      "Bash(wc:*)",
+      "Bash(curl:*)",
+      "Bash(ls:*)",
+      "Bash(pwd:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(find:*)",
+      "Bash(mkdir:*)",
       "Bash(timeout *opencode run*)",
       "Bash(TMPFILE=*opencode*)",
       "Bash(source */.env*)"
     ]
   },
   "enableAllProjectMcpServers": false,
-  "enabledMcpjsonServers": ["playwright"],
+  "enabledMcpjsonServers": [],
   "env": {
     "MAX_THINKING_TOKENS": "32000"
   }

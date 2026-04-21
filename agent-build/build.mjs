@@ -8,6 +8,7 @@
  *   node agent-build/build.mjs            # write files
  *   node agent-build/build.mjs --check    # exit 1 if any output would change
  *   node agent-build/build.mjs --verbose  # log every file written
+ *   node agent-build/build.mjs --prune    # also delete orphan files (not in manifest)
  *
  * Source of truth:
  *   - Bodies:      Agents/<name>.md, Commands/<name>.md
@@ -26,6 +27,7 @@ const ROOT = path.resolve(__dirname, '..');
 const args = new Set(process.argv.slice(2));
 const CHECK = args.has('--check');
 const VERBOSE = args.has('--verbose');
+const PRUNE = args.has('--prune');
 
 const TARGETS = {
   agents: {
@@ -102,6 +104,7 @@ function ensureDir(absDir) {
 
 let writes = 0;
 let drifts = 0;
+let pruned = 0;
 
 function writeOrCheck(relPath, content) {
   const abs = path.join(ROOT, relPath);
@@ -186,15 +189,26 @@ if (orphans.length) {
 }
 
 if (CHECK) {
+  if (PRUNE) {
+    console.error('\nERROR: --prune cannot be combined with --check.');
+    process.exit(2);
+  }
   if (drifts > 0 || orphans.length > 0) {
     console.error(`\nCHECK FAILED: ${drifts} drift(s), ${orphans.length} orphan(s).`);
     process.exit(1);
   }
   console.log('CHECK OK: all generated files match manifest.');
 } else {
-  console.log(`\nWrote ${writes} file(s).`);
-  if (orphans.length) {
+  if (PRUNE && orphans.length) {
+    for (const rel of orphans) {
+      fs.unlinkSync(path.join(ROOT, rel));
+      pruned++;
+      if (VERBOSE) console.log(`  prune ${rel}`);
+    }
+  }
+  console.log(`\nWrote ${writes} file(s).${PRUNE ? ` Pruned ${pruned} orphan(s).` : ''}`);
+  if (orphans.length && !PRUNE) {
     console.log('Run with care: orphans were NOT removed automatically.');
-    console.log('Delete them manually or add `--prune` (not yet implemented).');
+    console.log('Delete them manually or re-run with `--prune`.');
   }
 }

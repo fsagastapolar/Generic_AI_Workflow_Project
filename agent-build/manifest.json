@@ -13,6 +13,15 @@
       },
       "opencode": [
         {
+          "filename": "angular-tester.md",
+          "frontmatter": {
+            "description": "A specialized QA automation agent for Angular applications. It possesses exclusive access to Playwright MCP tools to perform end-to-end testing, verification, and debugging without polluting the main development context.",
+            "model": "github-copilot/claude-sonnet-4.5",
+            "tools": "browser_navigate, browser_navigate_back, browser_reload, browser_click, browser_fill, browser_select_option, browser_hover, browser_screenshot, browser_console_messages, browser_evaluate, browser_wait, browser_snapshot, bash,read_file",
+            "disallowedTools": "edit_file, browser_install, browser_launch_options"
+          }
+        },
+        {
           "filename": "angular-tester_GLM.md",
           "frontmatter": {
             "description": "A specialized QA automation agent for Angular applications. It possesses exclusive access to Playwright MCP tools to perform end-to-end testing, verification, and debugging without polluting the main development context.",
@@ -42,6 +51,14 @@
       },
       "opencode": [
         {
+          "filename": "codebase-analyzer.md",
+          "frontmatter": {
+            "description": "Analyzes codebase implementation details. Call the codebase-analyzer agent when you need to find detailed information about specific components. As always, the more detailed your request prompt, the better! :)",
+            "tools": "Read, Grep, Glob, LS",
+            "model": "github-copilot/claude-sonnet-4.5"
+          }
+        },
+        {
           "filename": "codebase-analyzer_GLM.md",
           "frontmatter": {
             "description": "Analyzes codebase implementation details. Call the codebase-analyzer agent when you need to find detailed information about specific components. As always, the more detailed your request prompt, the better!",
@@ -68,6 +85,14 @@
         }
       },
       "opencode": [
+        {
+          "filename": "codebase-locator.md",
+          "frontmatter": {
+            "description": "Locates files, directories, and components relevant to a feature or task. Call `codebase-locator` with human language prompt describing what you're looking for. Basically a \"Super Grep/Glob/LS tool\" — Use it if you find yourself desiring to use one of these tools more than once.",
+            "tools": "Grep, Glob, LS",
+            "model": "github-copilot/claude-sonnet-4.5"
+          }
+        },
         {
           "filename": "codebase-locator_GLM.md",
           "frontmatter": {
@@ -96,6 +121,14 @@
       },
       "opencode": [
         {
+          "filename": "codebase-pattern-finder.md",
+          "frontmatter": {
+            "description": "codebase-pattern-finder is a useful subagent_type for finding similar implementations, usage examples, or existing patterns that can be modeled after. It will give you concrete code examples based on what you're looking for! It's sorta like codebase-locator, but it will not only tell you the location of files, it will also give you code details!",
+            "tools": "Grep, Glob, Read, LS",
+            "model": "github-copilot/claude-sonnet-4.5"
+          }
+        },
+        {
           "filename": "codebase-pattern-finder_GLM.md",
           "frontmatter": {
             "description": "Finds similar implementations, usage examples, or existing patterns that can be modeled after. It gives you concrete code examples based on what you're looking for. Sorta like codebase-locator, but also gives code details!",
@@ -122,6 +155,14 @@
         }
       },
       "opencode": [
+        {
+          "filename": "e2e-test-guide-creator.md",
+          "frontmatter": {
+            "description": "Specialist agent for creating comprehensive API/E2E test guides with ready-to-run curl commands, seeded data IDs, SQL queries, and docker exec commands. Designed to minimize QA tester effort by providing complete, copy-paste-ready test instructions.",
+            "model": "github-copilot/claude-sonnet-4.5",
+            "tools": "Read, Grep, Glob, LS, bash"
+          }
+        },
         {
           "filename": "e2e-test-guide-creator_GLM.md",
           "frontmatter": {
@@ -150,6 +191,14 @@
         }
       },
       "opencode": [
+        {
+          "filename": "frontend-review.md",
+          "frontmatter": {
+            "description": "Frontend Architect & QA Sentinel. Enforces architectural standards, verifies visual fidelity, and ensures WCAG 2.1 AA compliance on all frontend changes.",
+            "tools": "Read, Grep, Glob, LS, Bash, WebFetch",
+            "model": "github-copilot/claude-opus-4.7"
+          }
+        },
         {
           "filename": "frontend-review_GLM.md",
           "frontmatter": {
@@ -180,6 +229,14 @@
       },
       "opencode": [
         {
+          "filename": "linear-manager.md",
+          "frontmatter": {
+            "description": "Manages Linear tickets and projects. Use this agent to create issues, update states, assign tickets, add comments, list issues by team/project/status, and manage workflows. Calls the Linear GraphQL API directly via curl — no MCP server required.",
+            "tools": "Bash, Read",
+            "model": "github-copilot/claude-sonnet-4.5"
+          }
+        },
+        {
           "filename": "linear-manager_GLM.md",
           "frontmatter": {
             "description": "Manages Linear tickets and projects. Create issues, update states, assign tickets, add comments, list issues. Calls the Linear GraphQL API directly via curl.",
@@ -207,6 +264,14 @@
       },
       "opencode": [
         {
+          "filename": "linear-searcher.md",
+          "frontmatter": {
+            "description": "Read-only agent for searching and reading Linear tickets. Use this to fetch ticket details by ID/identifier, search issues by keyword, or browse issues by status. Does NOT create or modify anything — use linear-manager for writes.",
+            "tools": "Bash, Read",
+            "model": "github-copilot/claude-sonnet-4.5"
+          }
+        },
+        {
           "filename": "linear-searcher_GLM.md",
           "frontmatter": {
             "description": "Read-only agent for searching and reading Linear tickets. Fetch ticket details, search by keyword, browse by status. Does NOT create or modify anything — use linear-manager for writes.",
@@ -233,6 +298,14 @@
         }
       },
       "opencode": [
+        {
+          "filename": "phase-executor.md",
+          "frontmatter": {
+            "description": "Executes a single phase from an implementation plan. Give it the plan path, the phase number, and any context from previous phases. It reads the plan, implements the changes for that specific phase, runs the automated verification, and reports results. Does NOT interact with the user — reports back to the caller.",
+            "tools": "Read, Write, Edit, Grep, Glob, LS, bash, Task",
+            "model": "github-copilot/claude-opus-4.7"
+          }
+        },
         {
           "filename": "phase-executor_GLM.md",
           "frontmatter": {
@@ -394,6 +467,14 @@
       },
       "opencode": [
         {
+          "filename": "plan-validator.md",
+          "frontmatter": {
+            "description": "Validates that an implementation matches its plan. Compares actual code changes against planned changes, runs verification commands, checks success criteria, and produces a structured validation report. Give it a plan path and it will audit the implementation.",
+            "tools": "Read, Grep, Glob, LS, bash",
+            "model": "github-copilot/claude-opus-4.7"
+          }
+        },
+        {
           "filename": "plan-validator_GLM.md",
           "frontmatter": {
             "description": "Validates that an implementation matches its plan. Compares actual code changes against planned changes, runs verification commands, checks success criteria, and produces a structured validation report.",
@@ -423,6 +504,14 @@
       },
       "opencode": [
         {
+          "filename": "plan-writer.md",
+          "frontmatter": {
+            "description": "Takes structured input (research brief, user decisions, scope) and produces a complete implementation plan document. Does not interact with the user — it receives finalized decisions and writes the plan file.",
+            "tools": "Read, Grep, Glob, LS, Write, Edit",
+            "model": "github-copilot/claude-opus-4.7"
+          }
+        },
+        {
           "filename": "plan-writer_GLM.md",
           "frontmatter": {
             "description": "Takes structured input (research brief, user decisions, scope) and produces a complete implementation plan document. Does not interact with the user — it receives finalized decisions and writes the plan file.",
@@ -450,6 +539,15 @@
         }
       },
       "opencode": [
+        {
+          "filename": "react-tester.md",
+          "frontmatter": {
+            "description": "A specialized QA automation agent for React applications. It possesses exclusive access to Playwright MCP tools to perform E2E testing, component verification, and debugging without polluting the main development context. Leverages the accessibility tree for resilient, semantic-based testing.",
+            "model": "github-copilot/claude-sonnet-4.5",
+            "tools": "browser_navigate, browser_navigate_back, browser_reload, browser_click, browser_fill, browser_select_option, browser_hover, browser_screenshot, browser_console_messages, browser_evaluate, browser_wait, browser_snapshot, bash, read_file",
+            "disallowedTools": "edit_file, browser_install, browser_launch_options"
+          }
+        },
         {
           "filename": "react-tester_GLM.md",
           "frontmatter": {
@@ -480,6 +578,14 @@
       },
       "opencode": [
         {
+          "filename": "research-gatherer.md",
+          "frontmatter": {
+            "description": "Orchestrates parallel codebase and thoughts research for a given task or ticket. Give it a task description, ticket content, or feature summary and it will spawn sub-agents to locate files, analyze implementations, find patterns, and surface relevant prior research. Returns a structured research brief with file:line references.",
+            "tools": "Read, Grep, Glob, LS, Task",
+            "model": "github-copilot/claude-opus-4.7"
+          }
+        },
+        {
           "filename": "research-gatherer_GLM.md",
           "frontmatter": {
             "description": "Orchestrates parallel codebase and thoughts research for a given task or ticket. Give it a task description, ticket content, or feature summary and it will spawn sub-agents to locate files, analyze implementations, find patterns, and surface relevant prior research. Returns a structured research brief with file:line references.",
@@ -506,6 +612,14 @@
         }
       },
       "opencode": [
+        {
+          "filename": "reviewer.md",
+          "frontmatter": {
+            "description": "specialized backend analysis agent. Use this to make a thorough review of the backend.",
+            "tools": "WebSearch, WebFetch, TodoWrite, Read, Grep, Glob, LS",
+            "model": "github-copilot/claude-opus-4.7"
+          }
+        },
         {
           "filename": "reviewer_GLM.md",
           "frontmatter": {
@@ -577,6 +691,14 @@
       },
       "opencode": [
         {
+          "filename": "testing-guide-orchestrator.md",
+          "frontmatter": {
+            "description": "Decides which testing guides are needed based on implementation type (API, frontend, full-stack, infra) and orchestrates their creation by delegating to the appropriate specialist agents (e2e-test-guide-creator, angular-tester, etc). Give it a summary of what was implemented and it handles the rest.",
+            "tools": "Read, Grep, Glob, LS, Task, Write, Edit",
+            "model": "github-copilot/claude-opus-4.7"
+          }
+        },
+        {
           "filename": "testing-guide-orchestrator_GLM.md",
           "frontmatter": {
             "description": "Decides which testing guides are needed based on implementation type (API, frontend, full-stack, infra) and orchestrates their creation by delegating to the appropriate specialist agents. Give it a summary of what was implemented and it handles the rest.",
@@ -603,6 +725,14 @@
         }
       },
       "opencode": [
+        {
+          "filename": "thoughts-analyzer.md",
+          "frontmatter": {
+            "description": "The research equivalent of codebase-analyzer. Use this subagent_type when wanting to deep dive on a research topic. Not commonly needed otherwise.",
+            "tools": "Read, Grep, Glob, LS",
+            "model": "github-copilot/claude-sonnet-4.5"
+          }
+        },
         {
           "filename": "thoughts-analyzer_GLM.md",
           "frontmatter": {
@@ -631,6 +761,14 @@
       },
       "opencode": [
         {
+          "filename": "thoughts-locator.md",
+          "frontmatter": {
+            "description": "Discovers relevant documents in thoughts/ directory (We use this for all sorts of metadata storage!). This is really only relevant/needed when you're in a reseaching mood and need to figure out if we have random thoughts written down that are relevant to your current research task. Based on the name, I imagine you can guess this is the `thoughts` equivilent of `codebase-locator`",
+            "tools": "Grep, Glob, LS",
+            "model": "github-copilot/claude-sonnet-4.5"
+          }
+        },
+        {
           "filename": "thoughts-locator_GLM.md",
           "frontmatter": {
             "description": "Discovers relevant documents in thoughts/ directory. This is the thoughts equivalent of codebase-locator. Use this when researching to find existing written-down thoughts relevant to your task.",
@@ -658,6 +796,15 @@
         }
       },
       "opencode": [
+        {
+          "filename": "vue-tester.md",
+          "frontmatter": {
+            "description": "A specialized QA automation agent for Vue.js applications. It possesses exclusive access to Playwright MCP tools to perform E2E testing, component testing, verification, and debugging without polluting the main development context.",
+            "model": "github-copilot/claude-sonnet-4.5",
+            "tools": "browser_navigate, browser_navigate_back, browser_reload, browser_click, browser_fill, browser_select_option, browser_hover, browser_screenshot, browser_console_messages, browser_evaluate, browser_wait, browser_snapshot, bash, read_file",
+            "disallowedTools": "edit_file, browser_install, browser_launch_options"
+          }
+        },
         {
           "filename": "vue-tester_GLM.md",
           "frontmatter": {
@@ -688,6 +835,15 @@
         }
       },
       "opencode": [
+        {
+          "filename": "web-search-researcher.md",
+          "frontmatter": {
+            "description": "Do you find yourself desiring information that you don't quite feel well-trained (confident) on? Information that is modern and potentially only discoverable on the web? Use the web-search-researcher subagent_type today to find any and all answers to your questions! It will research deeply to figure out and attempt to answer your questions! If you aren't immediately satisfied you can get your money back! (Not really - but you can re-run web-search-researcher with an altered prompt in the event you're not satisfied the first time)",
+            "tools": "WebSearch, WebFetch, TodoWrite, Read, Grep, Glob, LS",
+            "color": "yellow",
+            "model": "github-copilot/claude-sonnet-4.5"
+          }
+        },
         {
           "filename": "web-search-researcher_GLM.md",
           "frontmatter": {

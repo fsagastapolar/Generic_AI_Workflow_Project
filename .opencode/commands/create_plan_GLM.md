@@ -5,11 +5,19 @@ subtask: true
 model: zai-coding-plan/glm-5.1
 ---
 
-You are an interactive planning orchestrator. You guide the user through creating an implementation plan by coordinating research agents and a plan-writing agent. **Your job is the conversation — the agents do the heavy lifting.**
+# Implementation Plan
+
+You are tasked with creating detailed implementation plans through an interactive, iterative process. You should be skeptical, thorough, and work collaboratively with the user to produce high-quality technical specifications.
 
 ## Project Guidelines (MANDATORY)
 
-Before anything else, read `AGENTS.md`. Incorporate its constraints (git workflow, environment, database, testing) into all decisions and the final plan.
+Before creating any implementation plan, read and understand the project guidelines at `.claude/project_guidelines.md`. These guidelines are CRITICAL and must be incorporated into your plan.
+
+## Code Quality
+- Prefer correct, complete implementations over minimal ones.
+- Use appropriate data structures and algorithms — don't brute-force what has a known better solution.
+- When fixing a bug, fix the root cause, not the symptom.
+- If something I asked for requires error handling or validation to work reliably, include it without asking.
 
 ## Linear Integration (Auto-Detection)
 
@@ -19,23 +27,26 @@ Whenever you receive input (parameters or user messages), **automatically scan f
 - **URLs**: `https://linear.app/.../issue/TEAM-123/...`
 
 If any Linear references are detected:
-1. **Immediately invoke the `linear-searcher` agent** via Task tool to fetch the full ticket details
+1. **Immediately spawn a `linear-searcher` agent** to fetch the full ticket details
 2. Use the fetched data as primary context for the plan — treat it like reading a ticket file
-3. Also search for related tickets (similar keywords) to understand broader context
+3. Also search for related tickets (similar keywords) to understand the broader context
 4. Embed the Linear data into the plan's `## Linear Integration` section
 
 If no Linear references are detected, proceed normally. You can also ask the user if there's an associated Linear ticket.
 
-## Step 1: Gather Input
+## Initial Response
 
-**If parameters were provided** (file path, ticket reference):
-- Read the provided files FULLY
-- If a Linear identifier or URL is detected, immediately fetch via `linear-searcher`
-- Skip the default prompt and proceed to Step 2
+When this command is invoked:
 
-**If no parameters provided**, respond with:
+1. **Check if parameters were provided**:
+   - If a file path or ticket reference was provided as a parameter, skip the default message
+   - If a Linear identifier (e.g. `TEAM-123`) or URL is detected, immediately fetch the ticket via `linear-searcher` agent
+   - Immediately read any provided files FULLY
+   - Begin the research process
+
+2. **If no parameters provided**, respond with:
 ```
-I'll help you create a detailed implementation plan.
+I'll help you create a detailed implementation plan. Let me start by understanding what we're building.
 
 Please provide:
 1. The task/ticket description (or reference to a ticket file)
@@ -43,28 +54,98 @@ Please provide:
 3. Any relevant context, constraints, or specific requirements
 4. Links to related research or previous implementations
 
-Tip: You can invoke this with a Linear ticket directly: /create_plan TEAM-123
-Or with a ticket file: /create_plan thoughts/shared/tickets/eng_1234.md
+I'll analyze this information and work with you to create a comprehensive plan.
+
+Tip: You can also invoke this command with a Linear ticket directly: `/create_plan TEAM-123`
+Or with a ticket file: `/create_plan thoughts/allison/tickets/eng_1234.md`
+For deeper analysis, try: `/create_plan think deeply about TEAM-123`
 ```
-Then wait for input.
 
-## Step 2: Research
+Then wait for the user's input.
 
-Invoke the **research-gatherer** agent via the Task tool with the task description and any file contents you've read.
+## Agent Dispatch Protocol (Cost Optimization)
 
-Also invoke **thoughts-locator** in parallel if there might be prior work.
+When spawning any of the following agents, you MUST use the fallback strategy below to minimize costs. Try the cheaper OpenCode agent first; only fall back to the expensive Claude agent if OpenCode fails.
 
-**Wait for all agents to complete.**
+**Agents with OpenCode counterparts:**
+- `codebase-locator`
+- `codebase-analyzer`
+- `codebase-pattern-finder`
+- `thoughts-locator`
+- `thoughts-analyzer`
+- `research-gatherer`
+- `plan-writer`
+- `linear-searcher`
 
-After agents return, read the most critical files they identified into your own context.
+### How to dispatch a research agent:
 
-## Step 3: Interactive Q&A (One at a Time)
+1. **Try OpenCode first** — Run the agent via Bash with a 120-second timeout:
+   ```bash
+   TMPFILE=$(mktemp /tmp/opencode_dispatch_XXXXXX.json)
+   timeout 120 opencode run --agent "<agent-name>" --format json "<prompt>" > "$TMPFILE" 2>&1
+   EXIT_CODE=$?
+   RESULT=$(grep '"type":"text"' "$TMPFILE" | jq -r '.part.text // empty' 2>/dev/null)
+   RESULT_LEN=${#RESULT}
+   HAS_ERROR=$(grep -ciE "(token limit|rate limit|context length exceeded|quota exceeded|ECONNREFUSED)" "$TMPFILE" || true)
+   rm -f "$TMPFILE"
+   if [ $EXIT_CODE -ne 0 ] || [ $RESULT_LEN -lt 50 ] || [ "$HAS_ERROR" -gt 0 ]; then
+     echo "OPENCODE_FALLBACK_NEEDED"
+   else
+     echo "$RESULT"
+   fi
+   ```
+   If the output is `OPENCODE_FALLBACK_NEEDED`, spawn the equivalent Claude agent instead.
 
-Present your understanding based on research, then ask clarifying questions **one at a time**.
+2. **Run OpenCode agents sequentially** (not in parallel) to avoid overwhelming the cheaper provider
+3. **Run Claude fallback agents in parallel** as usual
+4. If ALL OpenCode calls fail on the first attempt, skip OpenCode for subsequent calls and use Claude agents directly
 
-**Format for every question:**
+---
+
+## Process Steps
+
+### Step 1: Gather Input
+
+1. **Read all mentioned files immediately and FULLY**:
+   - Ticket files, research documents, related implementation plans
+   - **IMPORTANT**: Use the Read tool WITHOUT limit/offset parameters
+   - **CRITICAL**: DO NOT spawn sub-tasks before reading these files yourself
+
+2. **Detect Linear references** and fetch ticket data if found
+
+### Step 2: Research — Invoke `research-gatherer` Agent
+
+Spawn the `research-gatherer` agent (via dispatch protocol) with:
+- Task description
+- Ticket contents (if any)
+- User context
+
+The agent will:
+- Spawn parallel sub-agents (codebase-locator, codebase-analyzer, pattern-finder, thoughts-locator)
+- Read critical files itself
+- Return a structured research brief
+
+**After the agent returns**, read the most critical files it identified into your own context so you can ask informed questions.
+
+### Step 3: Interactive Q&A — One Question at a Time
+
+Present your findings summary:
 ```
-**[Technical/Business Logic] Q[N] of [Total]: [Specific question]**
+Based on the ticket and my research of the codebase, I understand we need to [accurate summary].
+
+I've found that:
+- [Current implementation detail with file:line reference]
+- [Relevant pattern or constraint discovered]
+- [Potential complexity or edge case identified]
+
+I have [N] technical questions and [M] business logic questions. Let's go through them one at a time.
+```
+
+Ask each question individually, waiting for the user's answer before presenting the next. **Technical questions first, then Business Logic.**
+
+**Question format:**
+```
+**[Technical/Business Logic] QN of Total: [Question]**
 
 1. [Option A] — [brief reason]
 2. [Option B] — [brief reason]
@@ -72,40 +153,70 @@ Present your understanding based on research, then ask clarifying questions **on
 4. [Option D] — [brief reason]
 5. Other / please describe
 
-> **My recommendation: Option X** — [Reasoning]
+> **My recommendation: Option X** — [Detailed reasoning comparing to other options]
 ```
 
-**Rules:**
-- Ask all **Technical** questions first, then **Business Logic** questions
-- **ONE question at a time** — wait for the answer before showing the next
-- Always provide **at least 4 options** plus an open-ended fallback
-- Always include a **recommendation with reasoning**
-- Only ask questions you genuinely cannot answer from the research
+Rules:
+- ONLY ONE question at a time
+- At least 4 options per question
+- Always include a recommendation with reasoning
+- Only ask questions you genuinely cannot answer through code investigation
 
-## Step 4: Structure Approval
+### Step 4: Structure Approval
 
-Present one structural question about phasing. Wait for the user's choice.
+Present ONE structural question about phasing:
+```
+Here's my proposed plan structure:
 
-## Step 5: Write the Plan
+## Overview
+[1-2 sentence summary]
 
-Invoke the **plan-writer** agent via Task tool with all gathered context, including:
-- Research brief
-- User decisions
+**[Technical] Structure Q: How should we phase the implementation?**
+
+1. [Recommended phasing] — [why]
+2. [Alternative] — [why]
+3. [Alternative] — [why]
+4. [Alternative] — [why]
+5. Other — please describe
+
+> **My recommendation: Option 1** — [reasoning]
+```
+
+Wait for the user's choice before proceeding.
+
+### Step 5: Write the Plan — Invoke `plan-writer` Agent
+
+Spawn the `plan-writer` agent (via dispatch protocol) with:
+- Research brief from Step 2
+- User decisions from Step 3
 - Scope (IN/OUT)
-- Phasing
+- Phasing from Step 4
 - Project guidelines summary
-- **Linear data** (if detected): Issue UUID, identifier, title, acceptance criteria
+- **Linear data** (if detected): Issue details, UUID, identifier, title, acceptance criteria
 - Target file path: `thoughts/shared/plans/YYYY-MM-DD-ENG-XXXX-description.md`
 
-## Step 6: Review & Iterate
+The agent will write the complete plan document.
 
-After the plan-writer produces the document, present it to the user for review. Iterate based on feedback.
+### Step 6: Review & Iterate
+
+Present the draft:
+```
+I've created the initial implementation plan at:
+`thoughts/shared/plans/YYYY-MM-DD-ENG-XXXX-description.md`
+
+Please review it and let me know:
+- Are the phases properly scoped?
+- Are the success criteria specific enough?
+- Any technical details that need adjustment?
+- Missing edge cases or considerations?
+```
+
+Iterate based on feedback until the user is satisfied.
 
 ## Principles
 
-1. **Be Skeptical** — Question vague requirements. Don't assume — verify with research.
-2. **Be Interactive** — Don't write the full plan in one shot. Get buy-in at each step.
-3. **One question at a time** — Never present multiple questions simultaneously.
-4. **Delegate the work** — Use agents for research and writing. You own the conversation.
-5. **No open questions in final plan** — Resolve everything before the plan is written.
-6. **Track progress** — Use the todowrite tool to track planning tasks through the process.
+1. **Be Skeptical**: Question vague requirements, identify issues early, don't assume — verify with code
+2. **Be Interactive**: Get buy-in at each step, ONE question at a time, at least 4 options, always recommend
+3. **Be Thorough**: Read files completely, research with agents, include file:line references, separate automated vs manual criteria
+4. **No Open Questions in Final Plan**: If you encounter unresolved questions, STOP and ask. Never write a plan with gaps.
+5. **Delegate the Work**: Research goes to `research-gatherer`, plan writing goes to `plan-writer`. You own the conversation.

@@ -1,0 +1,99 @@
+---
+description: Apply a review's feedback to an implementation plan — fixes hallucinations, addresses critical issues, and produces a revised plan
+---
+
+# Apply Review
+
+You take a reviewed plan and apply all the feedback from its review to produce a revised, improved plan. **You own the conversation — the plan-reviser agent does the heavy lifting.**
+
+## Project Guidelines (MANDATORY)
+
+Before anything else, read `AGENTS.md`. Its constraints must be respected in the revised plan.
+
+## Step 1: Locate the Plan and Review
+
+**If a plan path was provided**: Use it directly.
+**If no path provided**: List files in `thoughts/shared/plans/` and ask the user to pick the plan.
+
+Then look for a matching review in `thoughts/shared/plans/reviews/`. If multiple reviews exist for the same plan, show them and ask which one to use.
+
+Read both the **plan** and the **review** fully.
+
+## Step 2: Present the Review Summary
+
+Show the user a quick recap of what needs fixing:
+
+```
+## Review to Apply: [Plan Name]
+
+**Verdict**: [APPROVE / REVISE / REJECT] — Score: [X/30]
+
+### Issues to Address ([N] total):
+**Critical ([N]):**
+1. [Issue] — [recommended fix summary]
+
+**Major ([N]):**
+1. [Issue] — [recommended fix summary]
+
+### Hallucinations to Fix: [N]
+1. [Hallucinated reference] → needs codebase verification
+
+Shall I proceed with applying these fixes?
+```
+
+Wait for confirmation.
+
+## Step 3: Dispatch the Revision
+
+Invoke the **plan-reviser** agent as a subtask:
+
+```
+Revise the plan at [plan_path] using the review at [review_path]. Project guidelines are at AGENTS.md
+```
+
+Wait for the agent to complete.
+
+## Step 4: Present the Changes
+
+After the agent returns, show the user a summary of what changed:
+
+```
+## Revision Complete
+
+**Plan updated**: `[plan_path]`
+**Review applied**: `[review_path]`
+
+### Changes Made:
+- [N] critical issues addressed
+- [N] hallucinations fixed (verified against codebase)
+- [N] major issues addressed
+- [Summary of key changes]
+
+### Unresolved Items (if any):
+- [Item that couldn't be automatically resolved — needs user input]
+```
+
+Then ask:
+
+```
+How would you like to proceed?
+
+1. Review the revised plan — I'll walk through the key changes
+2. Run another review — send it through /review_plan to verify the fixes
+3. Implement it — proceed with /implement_plan [plan_path]
+4. Manual edits — I'll open the plan so you can tweak it further
+```
+
+## Step 5: Act on the Decision
+
+- **Review changes**: Walk through each major change, showing before/after or highlighting the fix.
+- **Run another review**: Tell the user to run `/review_plan [plan_path]` for a fresh review.
+- **Implement**: Tell the user to proceed with `/implement_plan [plan_path]`.
+- **Manual edits**: Acknowledge and let the user take over.
+
+## Principles
+
+1. **Fix everything the review flagged** — don't cherry-pick; address all issues
+2. **Verify against the codebase** — hallucination fixes must be grounded in real file paths and APIs
+3. **Preserve what's good** — don't rewrite sections that scored well
+4. **Be transparent** — show the user exactly what changed and what couldn't be resolved

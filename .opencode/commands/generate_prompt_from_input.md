@@ -3,6 +3,8 @@ description: Transform user input into an optimized, structured prompt following
 agent: build
 ---
 
+# Generate Prompt
+
 You are an expert prompt engineer. Your task is to transform the user's raw input into a well-structured, optimized prompt following research-backed prompt engineering principles.
 
 ## User Input
@@ -18,44 +20,56 @@ $ARGUMENTS
 Before writing the prompt, reason through the following:
 
 1. **Primary intent** — What core objective should the generated prompt achieve?
-2. **Target agent role** — What persona should the prompt define?
-3. **Required context** — What background information is essential?
+2. **Target agent role** — What persona should the prompt define (orchestrator, researcher, implementer, reviewer, analyst, etc.)?
+3. **Required context** — What background information is essential for the agent to function correctly?
 4. **Task complexity** — Single-step, multi-step, or multi-agent routing?
-5. **Output requirements** — What format and structure should the final response take?
+5. **Output requirements** — What format and structure should the agent's final response take?
 
 ---
 
-## Step 2: Apply Prompt Engineering Principles
+## Step 2: Apply These Prompt Engineering Principles
 
-### XML Tagging
+### XML Tagging (Primary structuring mechanism for Claude)
 
-Wrap distinct sections in explicit XML tags:
+Wrap distinct sections in explicit XML tags to prevent instructional bleed and enable precise extraction:
 
 | Tag | Purpose |
 |-----|---------|
 | `<system_role>` | Persona — who the agent is and what it exclusively does |
-| `<context>` | Background placed BEFORE instructions |
+| `<context>` | Background placed BEFORE instructions (improves retrieval by ~30%) |
 | `<instructions>` | Core operational directives, written as positive commands |
 | `<constraints>` | Hard behavioral boundaries |
 | `<examples>` | Canonical multishot examples for calibration |
 | `<thinking>` | Mandatory reasoning scaffold before generating output |
-| `<formatting>` | Exact output schema |
+| `<formatting>` | Exact output schema — tell the model precisely what to produce |
 
 ### Structural order (attention optimization)
 
-1. Long-form reference data / context (first)
+1. Long-form reference data / context (first — before instructions)
 2. Persona in `<system_role>`
 3. Operational instructions in `<instructions>`
-4. Canonical examples in `<examples>`
-5. The actual task or query (last)
+4. Canonical examples in `<examples>` (include when routing or classification is involved)
+5. The actual task or query (last — preserves relevance at end of context window)
 
 ### Positive directives only
 
 Tell the model what to DO, not what to avoid.
+- Wrong: "Do not use vague language"
+- Right: "Use precise, specific language with measurable action verbs"
 
 ### Cognitive scaffolding
 
-For multi-step tasks, mandate explicit thinking before output.
+For multi-step or complex tasks, mandate explicit thinking before output:
+```xml
+<thinking>
+Analyze the input. Identify all required parameters. Reason through edge cases before producing the final answer.
+</thinking>
+```
+This distributes computation across tokens and drastically reduces hallucinations and routing errors.
+
+### Minimal and unambiguous scope
+
+The persona must explicitly state what the agent does NOT do. This prevents the agent from attempting to solve problems it was only meant to route or analyze.
 
 ---
 
@@ -65,13 +79,19 @@ Using the analysis from Step 1 and the principles from Step 2, produce the optim
 
 **Output rules:**
 - Wrap the entire prompt in a markdown code block with `xml` syntax highlighting
-- The generated prompt must be self-contained and immediately usable by another agent
+- Open with `<system_role>` that defines the persona and its exclusive purpose
+- Place `<context>` before `<instructions>` if background data is needed
+- Use numbered steps inside `<instructions>`
+- Include `<thinking>` scaffolding if the task has multiple steps or requires reasoning
+- Close with `<formatting>` that describes the exact output schema
+
+The generated prompt must be self-contained and immediately usable by another agent.
 
 ---
 
 ## Step 4: Present and Ask What to Do Next
 
-After displaying the generated prompt, ask the user:
+After displaying the generated prompt, use `AskUserQuestion` with this question and three options:
 
 **Question**: "What would you like to do with this prompt?"
 
@@ -81,23 +101,31 @@ After displaying the generated prompt, ask the user:
    Stop here. The prompt is ready to use.
 
 2. **Modify it**
-   Ask the user exactly what they want changed. Regenerate and repeat Step 4.
+   Ask the user exactly what they want changed (e.g., adjust persona, add examples, change output format, add project context, increase/decrease specificity). Regenerate the prompt with those changes, display it, and repeat Step 4.
 
 3. **Invoke a command with it**
-   List the available commands and let the user pick one to run, using the generated prompt as its input.
+   List the available commands and let the user pick one to run, using the generated prompt as its input task description.
 
 ---
 
 ## Step 5 (Only if Option 3 Was Chosen): Command Selection and Invocation
 
-Present the following available commands:
+Use `AskUserQuestion` to present the following available commands and ask the user to select one:
 
 | Command | What it does |
 |---------|-------------|
-| `create_plan` | Creates a detailed implementation plan through interactive research |
-| `implement_plan` | Implements a technical plan from thoughts/shared/plans |
-| `research_codebase_nt` | Documents the codebase as-is without evaluation |
-| `describe_pr_nt` | Generates a comprehensive PR description |
-| `create_handoff` | Creates a handoff document for another session |
+| `create_plan` | Creates a detailed implementation plan through interactive research and iteration |
+| `implement_plan` | Implements a technical plan from thoughts/shared/plans with step-by-step verification |
+| `research_codebase_nt` | Documents the codebase as-is without evaluation or recommendations |
+| `describe_pr_nt` | Generates a comprehensive PR description following repository templates |
+| `create_handoff` | Creates a handoff document for transferring work to another session |
 
-After the user selects a command, invoke it using the generated prompt as input.
+After the user selects a command, invoke it immediately using the `Skill` tool:
+
+```
+Skill tool:
+  skill: "<selected-command-name>"
+  args:  "<the full generated structured prompt>"
+```
+
+The generated prompt becomes the task description passed to the selected command. The command will execute with this structured input as its starting context.

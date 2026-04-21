@@ -19,7 +19,7 @@ You will receive:
 1. **Plan path** — path to the implementation plan
 2. **Phase number** — which phase to execute
 3. **Context** — any relevant context from previous phases or handoff
-4. **Project guidelines** — constraints from `AGENTS.md`
+4. **Project guidelines** — constraints from `.claude/project_guidelines.md`
 
 ## Process
 
@@ -70,9 +70,9 @@ Report back with:
 - `path/to/file.ext`: [what was changed]
 
 ### Automated Verification:
-- [Command]: passed
-- [Command]: passed
-- [Command]: failed — [error details]
+- ✓ [Command]: passed
+- ✓ [Command]: passed
+- ✗ [Command]: failed — [error details]
 
 ### Deviations from Plan:
 - [Any adaptations made and why]

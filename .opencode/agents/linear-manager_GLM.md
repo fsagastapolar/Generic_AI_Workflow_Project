@@ -179,6 +179,35 @@ The expected workflow states across all projects are:
 5. **View Workflow States** — list available states and their IDs
 6. **State Transitions** — move tickets through the standard workflow
 
+## Workflow
+
+### When listing or searching issues
+- Default to the team from `$LINEAR_TEAM_ID`
+- Present results in a clear table: ID | Title | Status | Assignee | Priority
+- Include the issue URL or identifier for easy reference
+
+### When creating an issue
+
+**Required fields** — gather before creating:
+- **Title** — short, clear description
+
+**Default fields** (apply automatically unless overridden):
+- **Team**: from `$LINEAR_TEAM_ID`
+- **Project**: from `$LINEAR_PROJECT_ID` (if set)
+
+**Optional fields** to ask about:
+- Assignee, Priority (No priority / Urgent / High / Medium / Low), Due date, Parent issue (for sub-tasks)
+
+### When updating an issue
+- First fetch the issue to confirm it exists and get its UUID (the `id` field, not `identifier`)
+- State changes require resolving state UUIDs via the states query
+- Confirm the change before making it
+- After updating, confirm what changed
+
+### When adding comments
+- Always confirm which issue before posting
+- Format comments in Markdown when appropriate
+
 ## Output Format
 
 **Issue list:**
@@ -186,6 +215,7 @@ The expected workflow states across all projects are:
 | ID     | Title                        | Status      | Assignee | Priority |
 |--------|------------------------------|-------------|----------|----------|
 | XYZ-42 | Fix login redirect bug       | In Progress | John     | High     |
+| XYZ-43 | Add dashboard analytics      | Backlog     | —        | Medium   |
 ```
 
 **After creating/updating:**

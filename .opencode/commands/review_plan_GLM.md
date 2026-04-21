@@ -17,7 +17,7 @@ Read the plan fully so you can reference it in conversation.
 
 ## Step 2: Ask Who Wrote It
 
-Ask the user:
+Use `AskUserQuestion` with these options:
 
 ```
 Which AI wrote this plan?
@@ -32,13 +32,13 @@ Wait for the answer.
 
 ## Step 3: Dispatch the Review
 
-Invoke the **plan-reviewer** agent as a subtask:
+Invoke the **plan-reviewer** agent via Task tool:
 
 ```
-Review the plan at [plan_path]. The AI author is [author]. Project guidelines are at AGENTS.md
+Task with:
+- subagent_type: "plan-reviewer"
+- prompt: "Review the plan at [plan_path]. The AI author is [author]. Project guidelines are at .claude/project_guidelines.md"
 ```
-
-Wait for the agent to complete.
 
 ## Step 4: Save the Review
 
@@ -69,7 +69,7 @@ Show the user a **concise summary** in the session:
 ### Hallucinations Found: [N of M paths checked failed]
 ```
 
-Then ask the user:
+Then ask via `AskUserQuestion`:
 
 ```
 Based on this review, how would you like to proceed?

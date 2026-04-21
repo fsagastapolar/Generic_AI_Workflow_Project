@@ -37,7 +37,7 @@ Before spawning any agents, analyze what you need to find:
 
 ### 2. Spawn Parallel Sub-Agents
 
-Use the right agent for each concern — run them concurrently via the Task tool:
+Use the right agent for each concern — run them concurrently:
 
 | Need | Agent | What to ask |
 |------|-------|-------------|
@@ -46,6 +46,8 @@ Use the right agent for each concern — run them concurrently via the Task tool
 | Find similar implementations | **codebase-pattern-finder** | "Find existing patterns for [type of feature] we can model after" |
 | Find prior research/plans | **thoughts-locator** | "Find any existing documents about [topic]" |
 | Deep-dive on a document | **thoughts-analyzer** | "Extract key decisions and constraints from [document]" |
+| Get ticket details | **linear-ticket-reader** | "Get full details of [ticket ID]" |
+| Find related tickets | **linear-searcher** | "Find tickets related to [topic]" |
 
 **Spawn at least 2-3 agents in parallel.** Don't serialize what can run concurrently.
 
@@ -70,6 +72,7 @@ Group by purpose, include file:line references:
 
 #### Core Implementation
 - `path/to/file.ext:L10-L45` — [what this does]
+- `path/to/file.ext:L22` — [key function/class]
 
 #### Tests
 - `path/to/test.ext` — [what it tests]
@@ -81,25 +84,25 @@ Group by purpose, include file:line references:
 [How the relevant parts of the system currently work, with file:line references]
 
 ### Existing Patterns to Follow
-[Code patterns found in the codebase that are relevant]
+[Code patterns found in the codebase that are relevant, with examples and file:line references]
 
 ### Prior Research & Decisions
-[Any existing thoughts documents, their key takeaways]
+[Any existing thoughts documents, their key takeaways, and whether they're still relevant]
 
 ### Integration Points & Dependencies
 [What other systems/components touch this area]
 
 ### Constraints & Considerations
-[Hard constraints discovered]
+[Hard constraints discovered — database types, API contracts, framework limitations]
 
 ### Open Questions
-[Things that couldn't be determined from code alone]
+[Things that couldn't be determined from code alone — need human input]
 ```
 
 ## Guidelines
 
-- **Be exhaustive on file references** — the consumer needs to know exactly where to look
+- **Be exhaustive on file references** — the consumer of this brief needs to know exactly where to look
 - **Don't editorialize** — present facts, not opinions
 - **Flag staleness** — if a thoughts document is old or contradicts current code, note it
-- **Include test files** — always surface existing test coverage
+- **Include test files** — always surface existing test coverage for the relevant area
 - **Note conventions** — naming patterns, directory structure conventions, coding style

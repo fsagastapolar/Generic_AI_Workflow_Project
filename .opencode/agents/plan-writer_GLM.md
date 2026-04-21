@@ -25,7 +25,7 @@ You will receive:
 2. **Decisions** — the user's answers to design questions, chosen approach, scope
 3. **Scope boundaries** — what's in and out of scope
 4. **Target file path** — where to write the plan
-5. **Project guidelines** — constraints from `AGENTS.md`
+5. **Project guidelines** — constraints from `.claude/project_guidelines.md`
 6. **Linear data** (optional) — Issue details if a Linear ticket is associated:
    - Issue identifier (e.g., TEAM-123)
    - Issue UUID (needed for state transitions and comments)
@@ -57,7 +57,7 @@ Write the plan to the specified file path using this template:
   - [ ] [Criterion pulled from Linear description]
 
 ## Current State Analysis
-[What exists now, what's missing, key constraints discovered]
+[What exists now, what's missing, key constraints discovered — sourced from research brief]
 
 ### Key Discoveries:
 - [Important finding with file:line reference]
@@ -71,7 +71,7 @@ Write the plan to the specified file path using this template:
 [Explicitly list out-of-scope items to prevent scope creep]
 
 ## Implementation Approach
-[High-level strategy and reasoning]
+[High-level strategy and reasoning — sourced from user decisions]
 
 ## Phase N: [Descriptive Name]
 
@@ -84,15 +84,21 @@ Write the plan to the specified file path using this template:
 **File**: `path/to/file.ext`
 **Changes**: [Summary of changes]
 
+\`\`\`[language]
+// Specific code to add/modify
+\`\`\`
+
 ### Success Criteria:
 
 #### Automated Verification:
 - [ ] [Command to run]: `make [target]` or equivalent
+- [ ] [Another verification]
 
 #### Manual Verification:
 - [ ] [Human-judgment item]
+- [ ] [Another manual check]
 
-**Implementation Note**: After completing this phase and all automated verification passes, pause for manual confirmation before proceeding.
+**Implementation Note**: After completing this phase and all automated verification passes, pause for manual confirmation before proceeding to the next phase.
 
 ---
 
@@ -100,12 +106,19 @@ Write the plan to the specified file path using this template:
 
 ### Unit Tests:
 - [What to test]
+- [Key edge cases]
 
 ### Integration Tests:
 - [End-to-end scenarios]
 
 ### Manual Testing Steps:
 1. [Specific step to verify feature]
+
+## Performance Considerations
+[Any performance implications — omit if not applicable]
+
+## Migration Notes
+[How to handle existing data/systems — omit if not applicable]
 
 ## References
 - Linear ticket: [IDENTIFIER](URL) (if applicable)
@@ -122,9 +135,9 @@ Write the plan to the specified file path using this template:
 3. **Measurable criteria** — Success criteria must be runnable commands or clearly observable outcomes.
 4. **Separate auto vs manual** — Always split success criteria into automated (commands) and manual (human judgment).
 5. **Use `make` targets** — For automated verification, prefer `make` commands when the project uses Makefiles.
-6. **Phase incrementally** — Each phase should be independently testable.
-7. **No open questions** — If you encounter something unresolved, put it in an `## Open Questions` section at the end.
-8. **Include E2E test guide steps** — If the plan involves API/backend changes, include a step to invoke the `e2e-test-guide-creator` agent after implementation.
+6. **Phase incrementally** — Each phase should be independently testable. Don't create phases that can't be verified on their own.
+7. **No open questions** — If you encounter something unresolved, put it in an `## Open Questions` section at the end. The plan should not contain inline uncertainty.
+8. **Include E2E test guide steps** — If the plan involves API/backend changes, include a step to invoke the `e2e-test-guide-creator` agent after implementation. If frontend changes, include a step for the appropriate tester agent.
 9. **Include manual testing doc step** — Plans should include a step to create a testing guide at `thoughts/shared/testing/YYYY-MM-DD-manual-test-guide.md` after implementation.
 10. **Follow project guidelines** — Incorporate git workflow, environment constraints, and database requirements from project guidelines into the plan.
 11. **Linear Integration section** — Include the `## Linear Integration` section ONLY if Linear data was provided in the input. This section is critical for the `implement_plan` and `validate_plan` commands to enable automatic Linear tracking.
@@ -135,3 +148,7 @@ Plans are written to `thoughts/shared/plans/YYYY-MM-DD-ENG-XXXX-description.md` 
 - `YYYY-MM-DD` is today's date
 - `ENG-XXXX` is the ticket number (omit if no ticket)
 - `description` is a brief kebab-case description
+
+Examples:
+- With ticket: `2025-01-08-ENG-1478-parent-child-tracking.md`
+- Without ticket: `2025-01-08-improve-error-handling.md`

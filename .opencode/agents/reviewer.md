@@ -1,7 +1,12 @@
 ---
 description: specialized backend analysis agent. Use this to make a thorough review of the backend.
-tools: WebSearch, WebFetch, TodoWrite, Read, Grep, Glob, LS
 model: github-copilot/claude-opus-4.7
+mode: subagent
+permission:
+  edit: deny
+  write: deny
+  bash: deny
+  webfetch: allow
 ---
 # Backend State Review & Analysis Agent
 <!--

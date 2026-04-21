@@ -14,6 +14,10 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 
+const LEGACY_OPENCODE_COLOR_MAP = {
+  yellow: '#FFC107',
+};
+
 // --- minimal YAML frontmatter parser (enough for our files) ---
 // Supports: scalar strings, scalar numbers/booleans, and one-level nested mappings
 // (e.g. `permission:\n  edit: deny`). No arrays needed.
@@ -106,6 +110,67 @@ function canonicalName(filename) {
   return base.replace(/_[A-Z][A-Z0-9]+$/, '');
 }
 
+function cloneObject(value) {
+  if (Array.isArray(value)) return value.map(cloneObject);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, cloneObject(v)]));
+  }
+  return value;
+}
+
+function splitLegacyToolList(value) {
+  if (typeof value !== 'string') return [];
+  return value
+    .split(',')
+    .map(item => item.trim())
+    .filter(Boolean);
+}
+
+function derivePermissionFromLegacyTools(toolsValue, disallowedToolsValue, existingPermission) {
+  const tools = new Set(splitLegacyToolList(toolsValue).map(item => item.toLowerCase()));
+  const disallowedTools = new Set(
+    splitLegacyToolList(disallowedToolsValue).map(item => item.toLowerCase())
+  );
+  const permission = cloneObject(existingPermission || {});
+
+  if (permission.edit === undefined) {
+    permission.edit = tools.has('edit') && !disallowedTools.has('edit_file') ? 'allow' : 'deny';
+  }
+  if (permission.write === undefined) {
+    permission.write = tools.has('write') ? 'allow' : 'deny';
+  }
+  if (permission.bash === undefined) {
+    permission.bash = tools.has('bash') ? 'allow' : 'deny';
+  }
+  if (permission.webfetch === undefined) {
+    permission.webfetch = tools.has('webfetch') || tools.has('websearch') ? 'allow' : 'deny';
+  }
+
+  return permission;
+}
+
+function normalizeOpencodeAgentFrontmatter(frontmatter) {
+  const fm = cloneObject(frontmatter || {});
+  const hasLegacyToolConfig = typeof fm.tools === 'string' || typeof fm.disallowedTools === 'string';
+
+  if (typeof fm.color === 'string') {
+    const mappedColor = LEGACY_OPENCODE_COLOR_MAP[fm.color.toLowerCase()];
+    if (mappedColor) fm.color = mappedColor;
+  }
+
+  if (fm.mode === undefined) {
+    fm.mode = 'subagent';
+  }
+
+  if (hasLegacyToolConfig) {
+    fm.permission = derivePermissionFromLegacyTools(fm.tools, fm.disallowedTools, fm.permission);
+    delete fm.tools;
+    delete fm.disallowedTools;
+  }
+
+  return fm;
+}
+
 function buildSection(claudeDir, opencodeDir, canonicalDir) {
   const out = {};
   const canonicalSet = new Set(listMd(canonicalDir).map(f => f.replace(/\.md$/, '')));
@@ -131,9 +196,12 @@ function buildSection(claudeDir, opencodeDir, canonicalDir) {
     if (!out[name]) out[name] = { claude: null, opencode: [] };
     const text = fs.readFileSync(path.join(ROOT, opencodeDir, f), 'utf8');
     const { frontmatter } = parseFrontmatter(text);
+    const normalizedFrontmatter = opencodeDir.endsWith('/agents')
+      ? normalizeOpencodeAgentFrontmatter(frontmatter)
+      : frontmatter;
     out[name].opencode.push({
       filename: f,
-      frontmatter,
+      frontmatter: normalizedFrontmatter,
     });
   }
 

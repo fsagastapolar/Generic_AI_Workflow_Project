@@ -1,7 +1,12 @@
 ---
 description: Frontend Architect & QA Sentinel. Enforces architectural standards, verifies visual fidelity, and ensures WCAG 2.1 AA compliance on all frontend changes.
-tools: Read, Grep, Glob, LS, Bash, WebFetch
 model: github-copilot/claude-opus-4.7
+mode: subagent
+permission:
+  edit: deny
+  write: deny
+  bash: allow
+  webfetch: allow
 ---
 # Agent Definition: Frontend Architect & QA Sentinel
 

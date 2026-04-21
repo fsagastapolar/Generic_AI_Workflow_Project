@@ -70,6 +70,10 @@ const TARGETS = {
   },
 };
 
+const LEGACY_OPENCODE_COLOR_MAP = {
+  yellow: '#FFC107',
+};
+
 // --- helpers -----------------------------------------------------------
 
 function stripFrontmatter(text) {
@@ -124,6 +128,67 @@ function emitFrontmatter(fm) {
   }
   lines.push('---', '');
   return lines.join('\n');
+}
+
+function cloneObject(value) {
+  if (Array.isArray(value)) return value.map(cloneObject);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, cloneObject(v)]));
+  }
+  return value;
+}
+
+function splitLegacyToolList(value) {
+  if (typeof value !== 'string') return [];
+  return value
+    .split(',')
+    .map(item => item.trim())
+    .filter(Boolean);
+}
+
+function derivePermissionFromLegacyTools(toolsValue, disallowedToolsValue, existingPermission) {
+  const tools = new Set(splitLegacyToolList(toolsValue).map(item => item.toLowerCase()));
+  const disallowedTools = new Set(
+    splitLegacyToolList(disallowedToolsValue).map(item => item.toLowerCase())
+  );
+  const permission = cloneObject(existingPermission || {});
+
+  if (permission.edit === undefined) {
+    permission.edit = tools.has('edit') && !disallowedTools.has('edit_file') ? 'allow' : 'deny';
+  }
+  if (permission.write === undefined) {
+    permission.write = tools.has('write') ? 'allow' : 'deny';
+  }
+  if (permission.bash === undefined) {
+    permission.bash = tools.has('bash') ? 'allow' : 'deny';
+  }
+  if (permission.webfetch === undefined) {
+    permission.webfetch = tools.has('webfetch') || tools.has('websearch') ? 'allow' : 'deny';
+  }
+
+  return permission;
+}
+
+function normalizeOpencodeAgentFrontmatter(frontmatter) {
+  const fm = cloneObject(frontmatter || {});
+  const hasLegacyToolConfig = typeof fm.tools === 'string' || typeof fm.disallowedTools === 'string';
+
+  if (typeof fm.color === 'string') {
+    const mappedColor = LEGACY_OPENCODE_COLOR_MAP[fm.color.toLowerCase()];
+    if (mappedColor) fm.color = mappedColor;
+  }
+
+  if (fm.mode === undefined) {
+    fm.mode = 'subagent';
+  }
+
+  if (hasLegacyToolConfig) {
+    fm.permission = derivePermissionFromLegacyTools(fm.tools, fm.disallowedTools, fm.permission);
+    delete fm.tools;
+    delete fm.disallowedTools;
+  }
+
+  return fm;
 }
 
 function ensureDir(absDir) {
@@ -191,7 +256,9 @@ for (const [section, dirs] of Object.entries(TARGETS)) {
       for (const variant of spec.opencode) {
         const filename = variant.filename || `${canonicalName}.md`;
         if (!variantSelected(filename)) continue;
-        const fm = variant.frontmatter || {};
+        const fm = section === 'agents'
+          ? normalizeOpencodeAgentFrontmatter(variant.frontmatter)
+          : (variant.frontmatter || {});
         const out = (Object.keys(fm).length ? emitFrontmatter(fm) : '') + body;
         const rel = path.join(dirs.opencodeDir, filename);
         expectedFiles[dirs.opencodeDir].add(filename);

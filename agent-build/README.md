@@ -36,6 +36,11 @@ agent-build/build.mjs    ← combines them and writes .claude/** and .opencode/*
 2. Run `npm run build:agents`.
 3. Commit.
 
+For OpenCode agents, prefer native frontmatter fields like `mode`, `permission`,
+`hidden`, and hex `color` values. The build script still normalizes legacy
+OpenCode `tools` / `disallowedTools` agent entries so older manifest data does
+not regenerate invalid markdown.
+
 ### Add a brand-new agent
 1. Create `Agents/<new-name>.md` with the body (no frontmatter needed).
 2. Add an entry to `agent-build/manifest.json` under `agents`:
@@ -155,6 +160,22 @@ the current manifest (and active filter, if any) does not produce.
 
 Note: the `--opencode=gh|glm` filter narrows what counts as "produced", so
 filtered-out variants become orphans and are subject to the rules above.
+
+## Legacy OpenCode Frontmatter
+
+Some historical OpenCode agent variants in this repo were authored with
+Claude-style fields such as `tools: "Read, Grep, Glob"`,
+`disallowedTools: "edit_file"`, or named colors like `yellow`.
+
+`agent-build/build.mjs` now normalizes those legacy OpenCode agent frontmatter
+values during generation:
+
+- adds `mode: subagent` if it is missing
+- converts legacy tool lists into an OpenCode `permission` object
+- drops `disallowedTools` after folding it into permissions
+- converts named colors like `yellow` to OpenCode-friendly hex values
+
+This keeps rebuilds safe while the manifest is migrated incrementally.
 
 ## CI hint
 

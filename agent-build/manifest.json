@@ -743,7 +743,8 @@
       "claude": {
         "filename": "create_handoff.md",
         "frontmatter": {
-          "description": "Create handoff document for transferring work to another session"
+          "description": "Create handoff document for transferring work to another session",
+          "model": "opus"
         }
       },
       "opencode": [
@@ -752,6 +753,16 @@
           "frontmatter": {
             "description": "Create handoff document for transferring work to another session",
             "agent": "build",
+            "model": "github-copilot/claude-opus-4.7",
+            "subtask": true
+          }
+        },
+        {
+          "filename": "create_handoff_GLM.md",
+          "frontmatter": {
+            "description": "Create handoff document for transferring work to another session",
+            "agent": "build",
+            "model": "zai-coding-plan/glm-5.1",
             "subtask": true
           }
         }
@@ -792,6 +803,15 @@
             "agent": "build",
             "subtask": true
           }
+        },
+        {
+          "filename": "debug_GLM.md",
+          "frontmatter": {
+            "description": "Debug issues by investigating logs, database state, and git history",
+            "agent": "build",
+            "subtask": true,
+            "model": "zai-coding-plan/glm-5.1"
+          }
         }
       ]
     },
@@ -810,6 +830,15 @@
             "agent": "build",
             "subtask": true
           }
+        },
+        {
+          "filename": "describe_pr_nt_GLM.md",
+          "frontmatter": {
+            "description": "Generate comprehensive PR descriptions following repository templates",
+            "agent": "build",
+            "subtask": true,
+            "model": "zai-coding-plan/glm-5.1"
+          }
         }
       ]
     },
@@ -826,6 +855,14 @@
           "frontmatter": {
             "description": "Transform user input into an optimized, structured prompt following advanced prompt engineering principles, then optionally invoke a command with it",
             "agent": "build"
+          }
+        },
+        {
+          "filename": "generate_prompt_from_input_GLM.md",
+          "frontmatter": {
+            "description": "Transform user input into an optimized, structured prompt following advanced prompt engineering principles, then optionally invoke a command with it",
+            "agent": "build",
+            "model": "zai-coding-plan/glm-5.1"
           }
         }
       ]
@@ -896,7 +933,7 @@
       },
       "opencode": [
         {
-          "filename": "review_plan_GH.md",
+          "filename": "review_plan_multi_agent.md",
           "frontmatter": {
             "description": "Multi-agent plan review — runs 2-3 independent reviewers (Claude, Gemini, Codex) in parallel, then consolidates and dedupes their findings with attribution. Replaces single-reviewer review_plan from the Claude setup.",
             "agent": "build",
@@ -908,12 +945,12 @@
           "frontmatter": {
             "description": "Ruthlessly review an implementation plan before executing it — identifies weak spots, hallucinations, and AI-specific pitfalls",
             "agent": "build",
-            "subtask": true
+            "subtask": true,
+            "model": "zai-coding-plan/glm-5.1"
           }
         }
       ]
     },
-    "review_plan_multi_agent": {},
     "security_review": {
       "claude": {
         "filename": "security_review.md",

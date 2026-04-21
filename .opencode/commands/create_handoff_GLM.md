@@ -1,6 +1,8 @@
 ---
 description: Create handoff document for transferring work to another session
-model: opus
+agent: build
+model: zai-coding-plan/glm-5.1
+subtask: true
 ---
 
 # Create Handoff

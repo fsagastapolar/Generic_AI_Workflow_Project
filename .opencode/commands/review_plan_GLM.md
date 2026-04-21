@@ -2,6 +2,7 @@
 description: Ruthlessly review an implementation plan before executing it — identifies weak spots, hallucinations, and AI-specific pitfalls
 agent: build
 subtask: true
+model: zai-coding-plan/glm-5.1
 ---
 
 # Review Plan

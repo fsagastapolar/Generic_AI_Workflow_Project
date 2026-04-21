@@ -9,6 +9,15 @@
  *   node agent-build/build.mjs --check    # exit 1 if any output would change
  *   node agent-build/build.mjs --verbose  # log every file written
  *   node agent-build/build.mjs --prune    # also delete orphan files (not in manifest)
+ *   node agent-build/build.mjs --opencode=gh|glm|both
+ *                                         # filter OpenCode variants by provider
+ *                                         # (default: both). Classification is by
+ *                                         # filename: *_GLM.md = GLM, else GH.
+ *                                         # Claude output is unaffected.
+ *                                         # Combine with --prune to delete the
+ *                                         # deselected variant files from disk.
+ *                                         # With --check, validates only the
+ *                                         # selected subset.
  *
  * Source of truth:
  *   - Bodies:      Agents/<name>.md, Commands/<name>.md
@@ -28,6 +37,25 @@ const args = new Set(process.argv.slice(2));
 const CHECK = args.has('--check');
 const VERBOSE = args.has('--verbose');
 const PRUNE = args.has('--prune');
+
+// --opencode=gh|glm|both  (default: both)
+const opencodeArg = process.argv.slice(2).find(a => a.startsWith('--opencode='));
+const OPENCODE_FILTER = (opencodeArg ? opencodeArg.split('=')[1] : 'both').toLowerCase();
+if (!['gh', 'glm', 'both'].includes(OPENCODE_FILTER)) {
+  console.error(`ERROR: --opencode must be one of: gh, glm, both. Got: "${OPENCODE_FILTER}"`);
+  process.exit(2);
+}
+
+// Classify a variant as 'glm' or 'gh' based on filename convention.
+function variantProvider(filename) {
+  return /_GLM\.md$/i.test(filename) ? 'glm' : 'gh';
+}
+
+// Returns true if a variant should be emitted given the active filter.
+function variantSelected(filename) {
+  if (OPENCODE_FILTER === 'both') return true;
+  return variantProvider(filename) === OPENCODE_FILTER;
+}
 
 const TARGETS = {
   agents: {
@@ -162,6 +190,7 @@ for (const [section, dirs] of Object.entries(TARGETS)) {
     if (Array.isArray(spec.opencode)) {
       for (const variant of spec.opencode) {
         const filename = variant.filename || `${canonicalName}.md`;
+        if (!variantSelected(filename)) continue;
         const fm = variant.frontmatter || {};
         const out = (Object.keys(fm).length ? emitFrontmatter(fm) : '') + body;
         const rel = path.join(dirs.opencodeDir, filename);
@@ -193,11 +222,12 @@ if (CHECK) {
     console.error('\nERROR: --prune cannot be combined with --check.');
     process.exit(2);
   }
+  const filterMsg = OPENCODE_FILTER === 'both' ? '' : ` (opencode filter: ${OPENCODE_FILTER})`;
   if (drifts > 0 || orphans.length > 0) {
-    console.error(`\nCHECK FAILED: ${drifts} drift(s), ${orphans.length} orphan(s).`);
+    console.error(`\nCHECK FAILED${filterMsg}: ${drifts} drift(s), ${orphans.length} orphan(s).`);
     process.exit(1);
   }
-  console.log('CHECK OK: all generated files match manifest.');
+  console.log(`CHECK OK${filterMsg}: all generated files match manifest.`);
 } else {
   if (PRUNE && orphans.length) {
     for (const rel of orphans) {
@@ -206,7 +236,8 @@ if (CHECK) {
       if (VERBOSE) console.log(`  prune ${rel}`);
     }
   }
-  console.log(`\nWrote ${writes} file(s).${PRUNE ? ` Pruned ${pruned} orphan(s).` : ''}`);
+  const filterMsg = OPENCODE_FILTER === 'both' ? '' : ` [opencode filter: ${OPENCODE_FILTER}]`;
+  console.log(`\nWrote ${writes} file(s)${filterMsg}.${PRUNE ? ` Pruned ${pruned} orphan(s).` : ''}`);
   if (orphans.length && !PRUNE) {
     console.log('Run with care: orphans were NOT removed automatically.');
     console.log('Delete them manually or re-run with `--prune`.');

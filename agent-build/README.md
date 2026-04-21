@@ -80,7 +80,63 @@ in the manifest.
 | `npm run build:agents` | Regenerate `.claude/` and `.opencode/` files from canonical bodies + manifest. |
 | `npm run build:agents:check` | Dry-run. Exit code 1 if any file would change or any orphan exists. Use in CI / pre-commit. |
 | `npm run build:agents:verbose` | Like `build:agents`, but logs every file written/skipped. |
+| `npm run build:agents:prune` | Like `build:agents`, but also deletes orphan `.md` files (present on disk, not in the manifest). |
+| `npm run build:agents:gh` | Build OpenCode files for the GH (GitHub Copilot) provider only. Claude output is unaffected. |
+| `npm run build:agents:glm` | Build OpenCode files for the GLM (z.ai) provider only. Claude output is unaffected. |
 | `npm run agents:extract` | One-shot: re-read every existing `.claude/`/`.opencode/` file and rebuild `manifest.json` from their current frontmatter. Useful after a major reorg, **destructive** to manual manifest edits. |
+
+### Raw flags
+
+The build script accepts these flags directly (`node agent-build/build.mjs <flags>`):
+
+| Flag | Effect |
+|---|---|
+| `--check` | Dry-run; exit 1 on any drift or orphan. |
+| `--verbose` | Log every file written / skipped / pruned. |
+| `--prune` | Delete orphan files from `.claude/**` and `.opencode/**`. Cannot combine with `--check`. |
+| `--opencode=gh\|glm\|both` | Filter which OpenCode variants get emitted. Default `both`. Classification is by filename: `*_GLM.md` → GLM, anything else → GH. Claude output is **never** filtered. |
+
+Flags compose. Useful combinations:
+
+```bash
+# Validate only the GH subset (GLM files on disk become orphans → CHECK fails).
+node agent-build/build.mjs --check --opencode=gh
+
+# Switch the working tree to GH-only mode and clean up the GLM files.
+node agent-build/build.mjs --opencode=gh --prune
+
+# Restore both providers.
+npm run build:agents
+```
+
+## Provider filtering (GH vs GLM)
+
+This repo runs on **two OpenCode aliases**: one defaults to GitHub Copilot
+models (`github-copilot/...`), the other to z.ai's GLM (`zai-coding-plan/...`).
+Most agents and commands therefore have two OpenCode variants:
+
+- `<name>.md` — the GH variant
+- `<name>_GLM.md` — the GLM variant
+
+If you only ever use one of the two aliases, you can keep your working tree
+lean by building only that subset:
+
+```bash
+npm run build:agents:gh    # writes only .opencode/**/<name>.md
+npm run build:agents:glm   # writes only .opencode/**/<name>_GLM.md
+```
+
+The other variants will appear as orphans on the next run; `--prune` deletes
+them. **Claude (`.claude/**`) is untouched** by this filter — Claude has
+exactly one variant per item, so there is nothing to filter.
+
+A few items intentionally exist for **only one** provider and are not
+affected by the filter:
+
+- The multi-agent reviewer trio (`plan-reviewer-claude`, `plan-reviewer-codex`,
+  `plan-reviewer-gemini`, `plan-review-consolidator`) and the
+  `review_plan_multi_agent` command are **GH-only** by design — they require
+  multiple model providers, which the GLM alias cannot supply.
 
 ## Path resolution
 
@@ -90,9 +146,15 @@ and in any clone of the project.
 
 ## Orphans
 
-If you delete an agent from the manifest but its generated file still exists
-on disk, the script will report it as an orphan but **will not** delete it
-automatically. Remove orphan files manually.
+An **orphan** is a `.md` file present in `.claude/**` or `.opencode/**` that
+the current manifest (and active filter, if any) does not produce.
+
+- `npm run build:agents` — reports orphans, leaves them on disk.
+- `npm run build:agents:check` — fails if any orphans exist.
+- `npm run build:agents:prune` — reports and **deletes** them.
+
+Note: the `--opencode=gh|glm` filter narrows what counts as "produced", so
+filtered-out variants become orphans and are subject to the rules above.
 
 ## CI hint
 

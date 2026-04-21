@@ -327,7 +327,7 @@
     "plan-review-consolidator": {
       "opencode": [
         {
-          "filename": "plan-review-consolidator_GH.md",
+          "filename": "plan-review-consolidator.md",
           "frontmatter": {
             "description": "Consolidates 2-3 independent plan reviews into a single, deduplicated, attributed final review. Matches findings across reviewers (multi-agent agreement boosts confidence), critiques each reviewer's work to catch errors, and produces an actionable consolidated report.",
             "model": "github-copilot/claude-opus-4.7",
@@ -345,7 +345,7 @@
     "plan-reviewer-claude": {
       "opencode": [
         {
-          "filename": "plan-reviewer-claude_GH.md",
+          "filename": "plan-reviewer-claude.md",
           "frontmatter": {
             "description": "Ruthlessly reviews implementation plans using Claude Opus 4.7. Identifies vague thinking, hallucinated file paths, and AI-specific pitfalls. Produces a structured review designed to be merged with reviews from sibling reviewer agents.",
             "model": "github-copilot/claude-opus-4.7",
@@ -363,7 +363,7 @@
     "plan-reviewer-codex": {
       "opencode": [
         {
-          "filename": "plan-reviewer-codex_GH.md",
+          "filename": "plan-reviewer-codex.md",
           "frontmatter": {
             "description": "Ruthlessly reviews implementation plans using GPT-5.3 Codex. Brings code-execution-mindset rigor — checks whether each step would actually run, whether commands are syntactically right, whether type signatures line up. One of three independent reviewers whose output feeds the consolidator.",
             "model": "github-copilot/gpt-5.3-codex",
@@ -381,7 +381,7 @@
     "plan-reviewer-gemini": {
       "opencode": [
         {
-          "filename": "plan-reviewer-gemini_GH.md",
+          "filename": "plan-reviewer-gemini.md",
           "frontmatter": {
             "description": "Ruthlessly reviews implementation plans using Gemini 3.1 Pro. Brings deep, long-context analysis and architectural pattern detection. One of three independent reviewers whose output feeds the consolidator.",
             "model": "github-copilot/gemini-3.1-pro-preview",

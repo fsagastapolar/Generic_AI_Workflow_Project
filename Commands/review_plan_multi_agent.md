@@ -67,9 +67,14 @@ If the directories don't exist, create them via `bash` (`mkdir -p thoughts/share
 
 ## Step 5: Dispatch Reviewers In Parallel
 
-**Critical: invoke all selected reviewer agents in a SINGLE message with parallel tool calls.** They are independent and must run concurrently for both speed and to avoid any cross-contamination.
+**Critical: invoke all selected reviewer agents via the Task tool in a SINGLE message with parallel tool calls.** They are independent and must run concurrently for both speed and to avoid any cross-contamination.
 
-For each selected reviewer, invoke the corresponding agent with a prompt like:
+For each selected reviewer, invoke the corresponding agent via the Task tool:
+
+- tool: `Task`
+- subagent_type: `plan-reviewer-claude` | `plan-reviewer-gemini` | `plan-reviewer-codex`
+- description: `Review plan ([reviewer name])`
+- prompt:
 
 ```
 Review the plan at [plan_path]. The AI author is [AUTHOR]. Project guidelines are at AGENTS.md.
@@ -89,7 +94,12 @@ After the reviewers return, check that each expected individual review file actu
 
 ## Step 7: Dispatch the Consolidator
 
-Invoke `plan-review-consolidator` with a prompt like:
+Invoke the `plan-review-consolidator` agent via the Task tool:
+
+- tool: `Task`
+- subagent_type: `plan-review-consolidator`
+- description: `Consolidate plan reviews`
+- prompt:
 
 ```
 Consolidate the following plan reviews into a single deduplicated, attributed final review.

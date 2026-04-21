@@ -2,7 +2,7 @@
 description: Validate implementation against plan, verify success criteria, identify issues
 agent: build
 subtask: true
-model: zai-coding-plan/glm-5.1
+model: github-copilot/claude-opus-4.7
 ---
 
 # Validate Plan

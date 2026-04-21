@@ -2,6 +2,7 @@
 description: Run a Semgrep-powered security review on specific features or the full project — produces severity-rated findings with remediation guidance
 agent: build
 subtask: true
+model: zai-coding-plan/glm-5.1
 ---
 
 # Security Review

@@ -1,5 +1,5 @@
 ---
-name: Reviewer-agent
+name: reviewer
 description: specialized backend analysis agent. Use this to make a thorough review of the backend.
 tools: WebSearch, WebFetch, TodoWrite, Read, Grep, Glob, LS
 model: sonnet

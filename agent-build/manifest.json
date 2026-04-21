@@ -25,8 +25,7 @@
                 "*": "allow"
               },
               "webfetch": "deny"
-            },
-            "hidden": true
+            }
           }
         }
       ]
@@ -143,7 +142,12 @@
     "frontend-review": {
       "claude": {
         "filename": "frontend-review.md",
-        "frontmatter": {}
+        "frontmatter": {
+          "name": "frontend-review",
+          "description": "Frontend Architect & QA Sentinel. Enforces architectural standards, verifies visual fidelity, and ensures WCAG 2.1 AA compliance on all frontend changes.",
+          "tools": "Read, Grep, Glob, LS, Bash, WebFetch",
+          "model": "sonnet"
+        }
       },
       "opencode": [
         {
@@ -186,8 +190,7 @@
               "write": "deny",
               "bash": "allow",
               "webfetch": "deny"
-            },
-            "hidden": true
+            }
           }
         }
       ]
@@ -214,8 +217,7 @@
               "write": "deny",
               "bash": "allow",
               "webfetch": "deny"
-            },
-            "hidden": true
+            }
           }
         }
       ]
@@ -244,8 +246,7 @@
                 "*": "allow"
               },
               "webfetch": "deny"
-            },
-            "hidden": true
+            }
           }
         }
       ]
@@ -346,20 +347,6 @@
               "webfetch": "deny"
             }
           }
-        },
-        {
-          "filename": "plan-reviewer_GLM.md",
-          "frontmatter": {
-            "description": "Ruthlessly reviews implementation plans before execution — scores, roasts, and provides fix recommendations. Identifies vague thinking, hallucinated file paths, and AI-specific pitfalls.",
-            "model": "zai-coding-plan/glm-5.1",
-            "mode": "subagent",
-            "permission": {
-              "edit": "deny",
-              "write": "deny",
-              "bash": "deny",
-              "webfetch": "deny"
-            }
-          }
         }
       ]
     },
@@ -376,8 +363,7 @@
               "write": "allow",
               "bash": "deny",
               "webfetch": "deny"
-            },
-            "hidden": true
+            }
           }
         },
         {
@@ -391,8 +377,7 @@
               "write": "allow",
               "bash": "deny",
               "webfetch": "deny"
-            },
-            "hidden": true
+            }
           }
         }
       ]
@@ -448,8 +433,7 @@
               "write": "allow",
               "bash": "deny",
               "webfetch": "deny"
-            },
-            "hidden": true
+            }
           }
         }
       ]
@@ -479,8 +463,7 @@
                 "*": "allow"
               },
               "webfetch": "deny"
-            },
-            "hidden": true
+            }
           }
         }
       ]
@@ -516,7 +499,7 @@
       "claude": {
         "filename": "reviewer.md",
         "frontmatter": {
-          "name": "Reviewer-agent",
+          "name": "reviewer",
           "description": "specialized backend analysis agent. Use this to make a thorough review of the backend.",
           "tools": "WebSearch, WebFetch, TodoWrite, Read, Grep, Glob, LS",
           "model": "sonnet"
@@ -604,8 +587,7 @@
               "write": "allow",
               "bash": "deny",
               "webfetch": "deny"
-            },
-            "hidden": true
+            }
           }
         }
       ]
@@ -689,8 +671,7 @@
                 "*": "allow"
               },
               "webfetch": "deny"
-            },
-            "hidden": true
+            }
           }
         }
       ]
@@ -719,7 +700,7 @@
               "bash": "deny",
               "webfetch": "allow"
             },
-            "color": "#FFC107"
+            "color": "yellow"
           }
         }
       ]
@@ -728,6 +709,15 @@
   "commands": {
     "apply_review": {
       "opencode": [
+        {
+          "filename": "apply_review.md",
+          "frontmatter": {
+            "description": "Apply a review's feedback to an implementation plan — fixes hallucinations, addresses critical issues, and produces a revised plan",
+            "agent": "build",
+            "subtask": true,
+            "model": "github-copilot/claude-opus-4.7"
+          }
+        },
         {
           "filename": "apply_review_GLM.md",
           "frontmatter": {
@@ -777,6 +767,15 @@
         }
       },
       "opencode": [
+        {
+          "filename": "create_plan.md",
+          "frontmatter": {
+            "description": "Create detailed implementation plans through interactive research and iteration",
+            "agent": "build",
+            "subtask": true,
+            "model": "github-copilot/claude-opus-4.7"
+          }
+        },
         {
           "filename": "create_plan_GLM.md",
           "frontmatter": {
@@ -876,6 +875,15 @@
       },
       "opencode": [
         {
+          "filename": "implement_plan.md",
+          "frontmatter": {
+            "description": "Implement technical plans from thoughts/shared/plans with verification",
+            "agent": "build",
+            "subtask": true,
+            "model": "github-copilot/claude-opus-4.7"
+          }
+        },
+        {
           "filename": "implement_plan_GLM.md",
           "frontmatter": {
             "description": "Implement technical plans from thoughts/shared/plans with verification",
@@ -896,6 +904,15 @@
       },
       "opencode": [
         {
+          "filename": "research_codebase_nt.md",
+          "frontmatter": {
+            "description": "Document codebase as-is without evaluation or recommendations",
+            "agent": "build",
+            "subtask": true,
+            "model": "github-copilot/claude-opus-4.7"
+          }
+        },
+        {
           "filename": "research_codebase_nt_GLM.md",
           "frontmatter": {
             "description": "Document codebase as-is without evaluation or recommendations",
@@ -915,11 +932,21 @@
       },
       "opencode": [
         {
+          "filename": "resume_handoff.md",
+          "frontmatter": {
+            "description": "Resume work from handoff document with context analysis and validation",
+            "agent": "build",
+            "subtask": true,
+            "model": "github-copilot/claude-opus-4.7"
+          }
+        },
+        {
           "filename": "resume_handoff_GLM.md",
           "frontmatter": {
             "description": "Resume work from handoff document with context analysis and validation",
             "agent": "build",
-            "subtask": true
+            "subtask": true,
+            "model": "zai-coding-plan/glm-5.1"
           }
         }
       ]
@@ -931,25 +958,7 @@
           "description": "Ruthlessly review an implementation plan before executing it — identifies weak spots, hallucinations, and AI-specific pitfalls"
         }
       },
-      "opencode": [
-        {
-          "filename": "review_plan_multi_agent.md",
-          "frontmatter": {
-            "description": "Multi-agent plan review — runs 2-3 independent reviewers (Claude, Gemini, Codex) in parallel, then consolidates and dedupes their findings with attribution. Replaces single-reviewer review_plan from the Claude setup.",
-            "agent": "build",
-            "model": "github-copilot/claude-opus-4.7"
-          }
-        },
-        {
-          "filename": "review_plan_GLM.md",
-          "frontmatter": {
-            "description": "Ruthlessly review an implementation plan before executing it — identifies weak spots, hallucinations, and AI-specific pitfalls",
-            "agent": "build",
-            "subtask": true,
-            "model": "zai-coding-plan/glm-5.1"
-          }
-        }
-      ]
+      "opencode": []
     },
     "security_review": {
       "claude": {
@@ -973,7 +982,8 @@
           "frontmatter": {
             "description": "Run a Semgrep-powered security review on specific features or the full project — produces severity-rated findings with remediation guidance",
             "agent": "build",
-            "subtask": true
+            "subtask": true,
+            "model": "zai-coding-plan/glm-5.1"
           }
         }
       ]
@@ -987,11 +997,33 @@
       },
       "opencode": [
         {
+          "filename": "validate_plan.md",
+          "frontmatter": {
+            "description": "Validate implementation against plan, verify success criteria, identify issues",
+            "agent": "build",
+            "subtask": true,
+            "model": "github-copilot/claude-opus-4.7"
+          }
+        },
+        {
           "filename": "validate_plan_GLM.md",
           "frontmatter": {
             "description": "Validate implementation against plan, verify success criteria, identify issues",
             "agent": "build",
-            "subtask": true
+            "subtask": true,
+            "model": "zai-coding-plan/glm-5.1"
+          }
+        }
+      ]
+    },
+    "review_plan_multi_agent": {
+      "opencode": [
+        {
+          "filename": "review_plan_multi_agent.md",
+          "frontmatter": {
+            "description": "Multi-agent plan review — runs 2-3 independent reviewers (Claude, Gemini, Codex) in parallel, then consolidates and dedupes their findings with attribution. GH-only because GLM cannot access multiple model providers.",
+            "agent": "build",
+            "model": "github-copilot/claude-opus-4.7"
           }
         }
       ]

@@ -2,7 +2,7 @@
 description: Resume work from handoff document with context analysis and validation
 agent: build
 subtask: true
-model: zai-coding-plan/glm-5.1
+model: github-copilot/claude-opus-4.7
 ---
 
 # Resume Handoff

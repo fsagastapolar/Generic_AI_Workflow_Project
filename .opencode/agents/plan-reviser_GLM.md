@@ -7,7 +7,6 @@ permission:
   write: allow
   bash: deny
   webfetch: deny
-hidden: true
 ---
 
 You are a specialist plan reviser. You receive an implementation plan and its review, and you produce a corrected version of the plan that addresses every issue raised in the review.

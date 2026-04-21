@@ -1,7 +1,5 @@
 ---
 description: Ruthlessly review an implementation plan before executing it — identifies weak spots, hallucinations, and AI-specific pitfalls
-agent: build
-subtask: true
 ---
 
 # Review Plan
@@ -17,35 +15,59 @@ Read the plan fully so you can reference it in conversation.
 
 ## Step 2: Ask Who Wrote It
 
-Ask the user:
+Use `AskUserQuestion` with these options:
 
 ```
 Which AI wrote this plan?
 
 1. Claude
 2. GLM
-3. ChatGPT
-4. Gemini
-5. Other / I don't know
+3. ChatGPT / Gemini
+4. Other / I don't know
 ```
 
 Wait for the answer.
 
 ## Step 3: Dispatch the Review
 
-Invoke the **plan-reviewer** agent as a subtask:
+Invoke the **plan-reviewer** agent via Task tool:
 
 ```
-Review the plan at [plan_path]. The AI author is [author]. Project guidelines are at AGENTS.md
+Task with:
+- subagent_type: "plan-reviewer"
+- prompt: "Review the plan at [plan_path]. The AI author is [author]. Project guidelines are at .claude/project_guidelines.md"
 ```
 
-Wait for the agent to complete.
+## Step 4: Save the Review
 
-## Step 4: Present the Review
+After the agent returns its review, **save the full review as a markdown file**:
 
-Show the review to the user as-is — it's already structured with scores, roast, hallucination checks, and fix recommendations.
+- Path: `thoughts/shared/plans/reviews/YYYY-MM-DD-[plan-name]-review.md`
+- The file should contain the complete review output from the agent (scores, roast, hallucination check, issues, recommendations, verdict)
 
-Then ask the user:
+## Step 5: Present a Summary
+
+Show the user a **concise summary** in the session:
+
+```
+## Review Summary for [Plan Name]
+
+**Verdict**: [APPROVE / REVISE / REJECT] — Score: [X/30]
+**Author AI**: [author]
+**Full review saved to**: `thoughts/shared/plans/reviews/YYYY-MM-DD-[plan-name]-review.md`
+
+### Score Highlights:
+- [Worst scoring dimension]: [score] — [one-liner]
+- [Second worst]: [score] — [one-liner]
+
+### Critical Issues ([N] found):
+1. [Issue title] — [one-line summary of the fix]
+2. [Issue title] — [one-line summary of the fix]
+
+### Hallucinations Found: [N of M paths checked failed]
+```
+
+Then ask via `AskUserQuestion`:
 
 ```
 Based on this review, how would you like to proceed?
@@ -56,7 +78,7 @@ Based on this review, how would you like to proceed?
 4. Scrap it — this plan needs a full rewrite
 ```
 
-## Step 5: Act on the Decision
+## Step 6: Act on the Decision
 
 - **Fix now**: Walk through each critical issue from the review. For each, present the recommended fix and apply it to the plan file after user confirmation.
 - **Send back to planner**: Tell the user to run `/create_plan [plan_path]` with instructions to address the review findings.

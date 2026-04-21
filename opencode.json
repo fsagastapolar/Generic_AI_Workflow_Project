@@ -1,5 +1,15 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "semgrep": {
+      "type": "local",
+      "command": ["uvx", "semgrep-mcp"],
+      "enabled": true
+    }
+  },
+  "tools": {
+    "semgrep*": false
+  },
   "agent": {
     "build": {
       "model": "zai-coding-plan/glm-5.1"
@@ -54,6 +64,12 @@
       "description": "Ruthlessly reviews implementation plans before execution — scores, roasts, and provides fix recommendations",
       "mode": "subagent",
       "model": "zai-coding-plan/glm-5.1"
+    },
+    "plan-reviser": {
+      "description": "Takes a plan and its review, applies all fixes, verifies hallucinations against the codebase, and produces a revised plan",
+      "mode": "subagent",
+      "model": "zai-coding-plan/glm-5.1",
+      "hidden": true
     },
     "plan-validator": {
       "description": "Validates that an implementation matches its plan",
@@ -115,6 +131,14 @@
       "mode": "subagent",
       "model": "zai-coding-plan/glm-5.1",
       "color": "#FFC107"
+    },
+    "security-reviewer": {
+      "description": "Cybersecurity specialist using Semgrep for security reviews — produces severity-rated findings with remediation guidance",
+      "mode": "subagent",
+      "model": "zai-coding-plan/glm-5.1",
+      "tools": {
+        "semgrep*": true
+      }
     }
   }
 }

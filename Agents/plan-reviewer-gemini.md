@@ -31,6 +31,8 @@ You will receive:
 3. **Output path** — where to write your structured review markdown file
 4. **Project guidelines path** — `AGENTS.md`
 
+*Note: You may also be invoked as a subtask specifically to verify a single finding raised by another reviewer. In that case, evaluate that specific issue, verify it against the plan and codebase, and state clearly whether it is valid or incorrect.*
+
 ## Process
 
 ### 1. Deep Read

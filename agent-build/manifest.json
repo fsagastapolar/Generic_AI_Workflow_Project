@@ -336,7 +336,13 @@
               "edit": "allow",
               "write": "allow",
               "bash": "deny",
-              "webfetch": "deny"
+              "webfetch": "deny",
+              "task": {
+                "*": "deny",
+                "plan-reviewer-claude": "allow",
+                "plan-reviewer-codex": "allow",
+                "plan-reviewer-gemini": "allow"
+              }
             }
           }
         }

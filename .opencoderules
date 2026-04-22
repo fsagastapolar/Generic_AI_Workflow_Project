@@ -1,0 +1,18 @@
+# ⚠️ REPOSITORY ARCHITECTURE & AGENT MODIFICATION RULES ⚠️
+
+This repository uses a build system for AI agents and commands. The `.opencode/` and `.claude/` directories are **compiled outputs** and should **NEVER** be edited directly.
+
+**SOURCE OF TRUTH:**
+If you are asked to modify, update, or create an agent, command, or AI workflow, you MUST make your changes in the following source directories:
+1. **Agent Logic/Prompts:** Edit or create `.md` files inside the `Agents/` directory.
+2. **Command Logic:** Edit or create `.md` files inside the `Commands/` directory.
+3. **Configurations/Metadata:** Modify `agent-build/manifest.json`.
+
+**BUILD PROCESS:**
+After making any changes to the source files (`Agents/*`, `Commands/*`, or `agent-build/manifest.json`), you MUST run the build script to compile the changes:
+```bash
+cd agent-build
+node build.mjs
+```
+
+By following this workflow, you ensure that all AI tools remain in sync and changes are preserved across builds.

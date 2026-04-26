@@ -1,7 +1,7 @@
 ---
 description: Create handoff document for transferring work to another session
 agent: build
-model: github-copilot/claude-opus-4.7
+model: github-copilot/gpt-5.3-codex
 subtask: true
 ---
 > [!WARNING]

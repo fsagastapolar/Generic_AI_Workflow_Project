@@ -1,6 +1,6 @@
 ---
 description: specialized backend analysis agent. Use this to make a thorough review of the backend.
-model: github-copilot/claude-opus-4.7
+model: github-copilot/gpt-5.3-codex
 mode: subagent
 permission:
   edit: deny

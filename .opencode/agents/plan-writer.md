@@ -1,6 +1,6 @@
 ---
 description: Takes structured input (research brief, user decisions, scope) and produces a complete implementation plan document. Does not interact with the user — it receives finalized decisions and writes the plan file.
-model: github-copilot/claude-opus-4.7
+model: github-copilot/gpt-5.3-codex
 mode: subagent
 permission:
   edit: allow
@@ -43,6 +43,16 @@ Write the plan to the specified file path using this template:
 
 ```markdown
 # [Feature/Task Name] Implementation Plan
+
+## Plan Metadata
+- **AI Author**: [agent/model identifier used to write the plan]
+- **Created**: [YYYY-MM-DD]
+- **Last Updated**: [YYYY-MM-DD]
+- **Review Status**: Not Reviewed
+- **Review Count**: 0
+
+## Review History
+- (empty until first review)
 
 ## Overview
 [Brief description of what we're implementing and why]

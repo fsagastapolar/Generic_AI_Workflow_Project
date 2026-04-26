@@ -196,7 +196,7 @@
           "frontmatter": {
             "description": "Frontend Architect & QA Sentinel. Enforces architectural standards, verifies visual fidelity, and ensures WCAG 2.1 AA compliance on all frontend changes.",
             "tools": "Read, Grep, Glob, LS, Bash, WebFetch",
-            "model": "github-copilot/claude-opus-4.7"
+            "model": "github-copilot/gpt-5.3-codex"
           }
         },
         {
@@ -303,7 +303,7 @@
           "frontmatter": {
             "description": "Executes a single phase from an implementation plan. Give it the plan path, the phase number, and any context from previous phases. It reads the plan, implements the changes for that specific phase, runs the automated verification, and reports results. Does NOT interact with the user — reports back to the caller.",
             "tools": "Read, Write, Edit, Grep, Glob, LS, bash, Task",
-            "model": "github-copilot/claude-opus-4.7"
+            "model": "github-copilot/gpt-5.3-codex"
           }
         },
         {
@@ -330,7 +330,7 @@
           "filename": "plan-review-consolidator.md",
           "frontmatter": {
             "description": "Consolidates 2-3 independent plan reviews into a single, deduplicated, attributed final review. Matches findings across reviewers (multi-agent agreement boosts confidence), critiques each reviewer's work to catch errors, and produces an actionable consolidated report.",
-            "model": "github-copilot/claude-opus-4.7",
+            "model": "github-copilot/gpt-5.3-codex",
             "mode": "subagent",
             "permission": {
               "edit": "allow",
@@ -417,7 +417,7 @@
           "filename": "plan-reviewer_GH.md",
           "frontmatter": {
             "description": "Ruthlessly reviews implementation plans before execution — scores, roasts, and provides fix recommendations. Identifies vague thinking, hallucinated file paths, and AI-specific pitfalls.",
-            "model": "github-copilot/claude-opus-4.7",
+            "model": "github-copilot/gpt-5.3-codex",
             "mode": "subagent",
             "permission": {
               "edit": "allow",
@@ -435,7 +435,7 @@
           "filename": "plan-reviser_GH.md",
           "frontmatter": {
             "description": "Takes an implementation plan and its review, and produces a revised plan that addresses all critical issues, hallucinations, and recommendations from the review.",
-            "model": "github-copilot/claude-opus-4.7",
+            "model": "github-copilot/gpt-5.3-codex",
             "mode": "subagent",
             "permission": {
               "edit": "allow",
@@ -477,7 +477,7 @@
           "frontmatter": {
             "description": "Validates that an implementation matches its plan. Compares actual code changes against planned changes, runs verification commands, checks success criteria, and produces a structured validation report. Give it a plan path and it will audit the implementation.",
             "tools": "Read, Grep, Glob, LS, bash",
-            "model": "github-copilot/claude-opus-4.7"
+            "model": "github-copilot/gpt-5.3-codex"
           }
         },
         {
@@ -514,7 +514,7 @@
           "frontmatter": {
             "description": "Takes structured input (research brief, user decisions, scope) and produces a complete implementation plan document. Does not interact with the user — it receives finalized decisions and writes the plan file.",
             "tools": "Read, Grep, Glob, LS, Write, Edit",
-            "model": "github-copilot/claude-opus-4.7"
+            "model": "github-copilot/gpt-5.3-codex"
           }
         },
         {
@@ -588,7 +588,7 @@
           "frontmatter": {
             "description": "Orchestrates parallel codebase and thoughts research for a given task or ticket. Give it a task description, ticket content, or feature summary and it will spawn sub-agents to locate files, analyze implementations, find patterns, and surface relevant prior research. Returns a structured research brief with file:line references.",
             "tools": "Read, Grep, Glob, LS, Task",
-            "model": "github-copilot/claude-opus-4.7"
+            "model": "github-copilot/gpt-5.3-codex"
           }
         },
         {
@@ -623,7 +623,7 @@
           "frontmatter": {
             "description": "specialized backend analysis agent. Use this to make a thorough review of the backend.",
             "tools": "WebSearch, WebFetch, TodoWrite, Read, Grep, Glob, LS",
-            "model": "github-copilot/claude-opus-4.7"
+            "model": "github-copilot/gpt-5.3-codex"
           }
         },
         {
@@ -659,7 +659,7 @@
           "filename": "security-reviewer_GH.md",
           "frontmatter": {
             "description": "Cybersecurity specialist that uses Semgrep MCP to perform targeted or broad security reviews. Produces severity-rated findings with CWE/OWASP references and actionable remediation guidance.",
-            "model": "github-copilot/claude-opus-4.7",
+            "model": "github-copilot/gpt-5.3-codex",
             "mode": "subagent",
             "permission": {
               "edit": "deny",
@@ -701,7 +701,7 @@
           "frontmatter": {
             "description": "Decides which testing guides are needed based on implementation type (API, frontend, full-stack, infra) and orchestrates their creation by delegating to the appropriate specialist agents (e2e-test-guide-creator, angular-tester, etc). Give it a summary of what was implemented and it handles the rest.",
             "tools": "Read, Grep, Glob, LS, Task, Write, Edit",
-            "model": "github-copilot/claude-opus-4.7"
+            "model": "github-copilot/gpt-5.3-codex"
           }
         },
         {
@@ -877,7 +877,7 @@
             "description": "Apply a review's feedback to an implementation plan — fixes hallucinations, addresses critical issues, and produces a revised plan",
             "agent": "build",
             "subtask": true,
-            "model": "github-copilot/claude-opus-4.7"
+            "model": "github-copilot/gpt-5.3-codex"
           }
         },
         {
@@ -905,7 +905,7 @@
           "frontmatter": {
             "description": "Create handoff document for transferring work to another session",
             "agent": "build",
-            "model": "github-copilot/claude-opus-4.7",
+            "model": "github-copilot/gpt-5.3-codex",
             "subtask": true
           }
         },
@@ -935,7 +935,7 @@
             "description": "Create detailed implementation plans through interactive research and iteration",
             "agent": "build",
             "subtask": true,
-            "model": "github-copilot/claude-opus-4.7"
+            "model": "github-copilot/gpt-5.3-codex"
           }
         },
         {
@@ -1042,7 +1042,7 @@
             "description": "Implement technical plans from thoughts/shared/plans with verification",
             "agent": "build",
             "subtask": true,
-            "model": "github-copilot/claude-opus-4.7"
+            "model": "github-copilot/gpt-5.3-codex"
           }
         },
         {
@@ -1071,7 +1071,7 @@
             "description": "Document codebase as-is without evaluation or recommendations",
             "agent": "build",
             "subtask": true,
-            "model": "github-copilot/claude-opus-4.7"
+            "model": "github-copilot/gpt-5.3-codex"
           }
         },
         {
@@ -1099,7 +1099,7 @@
             "description": "Resume work from handoff document with context analysis and validation",
             "agent": "build",
             "subtask": true,
-            "model": "github-copilot/claude-opus-4.7"
+            "model": "github-copilot/gpt-5.3-codex"
           }
         },
         {
@@ -1136,7 +1136,7 @@
           "frontmatter": {
             "description": "Run a Semgrep-powered security review on specific features or the full project — produces severity-rated findings with remediation guidance",
             "agent": "build",
-            "model": "github-copilot/claude-opus-4.7"
+            "model": "github-copilot/gpt-5.3-codex"
           }
         },
         {
@@ -1164,7 +1164,7 @@
             "description": "Validate implementation against plan, verify success criteria, identify issues",
             "agent": "build",
             "subtask": true,
-            "model": "github-copilot/claude-opus-4.7"
+            "model": "github-copilot/gpt-5.3-codex"
           }
         },
         {
@@ -1185,7 +1185,7 @@
           "frontmatter": {
             "description": "Multi-agent plan review — runs 2-3 independent reviewers (Claude, Gemini, Codex) in parallel, then consolidates and dedupes their findings with attribution. GH-only because GLM cannot access multiple model providers.",
             "agent": "build",
-            "model": "github-copilot/claude-opus-4.7"
+            "model": "github-copilot/gpt-5.3-codex"
           }
         }
       ]

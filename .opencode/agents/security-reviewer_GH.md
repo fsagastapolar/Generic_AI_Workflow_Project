@@ -1,6 +1,6 @@
 ---
 description: Cybersecurity specialist that uses Semgrep MCP to perform targeted or broad security reviews. Produces severity-rated findings with CWE/OWASP references and actionable remediation guidance.
-model: github-copilot/claude-opus-4.7
+model: github-copilot/gpt-5.3-codex
 mode: subagent
 permission:
   edit: deny

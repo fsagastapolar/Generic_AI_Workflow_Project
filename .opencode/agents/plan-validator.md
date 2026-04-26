@@ -1,6 +1,6 @@
 ---
 description: Validates that an implementation matches its plan. Compares actual code changes against planned changes, runs verification commands, checks success criteria, and produces a structured validation report. Give it a plan path and it will audit the implementation.
-model: github-copilot/claude-opus-4.7
+model: github-copilot/gpt-5.3-codex
 mode: subagent
 permission:
   edit: deny

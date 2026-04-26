@@ -1,6 +1,6 @@
 ---
 description: Orchestrates parallel codebase and thoughts research for a given task or ticket. Give it a task description, ticket content, or feature summary and it will spawn sub-agents to locate files, analyze implementations, find patterns, and surface relevant prior research. Returns a structured research brief with file:line references.
-model: github-copilot/claude-opus-4.7
+model: github-copilot/gpt-5.3-codex
 mode: subagent
 permission:
   edit: deny

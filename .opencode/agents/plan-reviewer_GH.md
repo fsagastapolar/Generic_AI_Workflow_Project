@@ -1,6 +1,6 @@
 ---
 description: Ruthlessly reviews implementation plans before execution — scores, roasts, and provides fix recommendations. Identifies vague thinking, hallucinated file paths, and AI-specific pitfalls.
-model: github-copilot/claude-opus-4.7
+model: github-copilot/gpt-5.3-codex
 mode: subagent
 permission:
   edit: allow

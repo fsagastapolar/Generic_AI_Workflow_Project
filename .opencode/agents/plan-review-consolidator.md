@@ -1,6 +1,6 @@
 ---
 description: Consolidates 2-3 independent plan reviews into a single, deduplicated, attributed final review. Matches findings across reviewers (multi-agent agreement boosts confidence), critiques each reviewer's work to catch errors, and produces an actionable consolidated report.
-model: github-copilot/claude-opus-4.7
+model: github-copilot/gpt-5.3-codex
 mode: subagent
 permission:
   edit: allow

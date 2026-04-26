@@ -1,6 +1,6 @@
 ---
 description: Executes a single phase from an implementation plan. Give it the plan path, the phase number, and any context from previous phases. It reads the plan, implements the changes for that specific phase, runs the automated verification, and reports results. Does NOT interact with the user — reports back to the caller.
-model: github-copilot/claude-opus-4.7
+model: github-copilot/gpt-5.3-codex
 mode: subagent
 permission:
   edit: allow

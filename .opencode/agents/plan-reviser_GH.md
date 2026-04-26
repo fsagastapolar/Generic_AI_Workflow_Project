@@ -1,6 +1,6 @@
 ---
 description: Takes an implementation plan and its review, and produces a revised plan that addresses all critical issues, hallucinations, and recommendations from the review.
-model: github-copilot/claude-opus-4.7
+model: github-copilot/gpt-5.3-codex
 mode: subagent
 permission:
   edit: allow

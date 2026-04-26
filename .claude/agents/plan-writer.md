@@ -40,6 +40,16 @@ Write the plan to the specified file path using this template:
 ```markdown
 # [Feature/Task Name] Implementation Plan
 
+## Plan Metadata
+- **AI Author**: [agent/model identifier used to write the plan]
+- **Created**: [YYYY-MM-DD]
+- **Last Updated**: [YYYY-MM-DD]
+- **Review Status**: Not Reviewed
+- **Review Count**: 0
+
+## Review History
+- (empty until first review)
+
 ## Overview
 [Brief description of what we're implementing and why]
 

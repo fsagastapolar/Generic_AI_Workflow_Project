@@ -191,6 +191,19 @@ Spawn the `plan-writer` agent (via dispatch protocol) with:
 - Phasing from Step 4
 - Project guidelines summary
 - **Linear data** (if detected): Issue details, UUID, identifier, title, acceptance criteria
+- **Plan metadata requirement**: Include a plan header with metadata so review tooling can update it later.
+  - Required section (placed right after the title, before `## Overview`):
+    ```
+    ## Plan Metadata
+    - **AI Author**: <agent/model identifier used to write the plan>
+    - **Created**: YYYY-MM-DD
+    - **Last Updated**: YYYY-MM-DD
+    - **Review Status**: Not Reviewed
+    - **Review Count**: 0
+
+    ## Review History
+    - (empty until first review)
+    ```
 - Target file path: `thoughts/shared/plans/YYYY-MM-DD-ENG-XXXX-description.md`
 
 The agent will write the complete plan document.

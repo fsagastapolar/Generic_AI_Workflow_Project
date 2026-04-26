@@ -409,7 +409,7 @@
           "name": "plan-reviewer",
           "description": "Ruthlessly reviews implementation plans before they are executed. Identifies vague thinking, missing edge cases, unrealistic phases, and AI-specific hallucination patterns. Returns a brutal but actionable review with concrete fix recommendations.",
           "tools": "Read, Grep, Glob, LS",
-          "model": "opus 4.6"
+          "model": "opus"
         }
       },
       "opencode": [
@@ -651,7 +651,7 @@
           "name": "security-reviewer",
           "description": "Cybersecurity specialist that uses Semgrep MCP to perform targeted or broad security reviews. Produces severity-rated findings with CWE/OWASP references and actionable remediation guidance. Outputs a detailed markdown report.",
           "tools": "security_check, semgrep_scan, semgrep_scan_with_custom_rule, get_abstract_syntax_tree, supported_languages, semgrep_rule_schema, Read, Grep, Glob, Write",
-          "model": "opus 4.6"
+          "model": "opus"
         }
       },
       "opencode": [
@@ -896,7 +896,7 @@
         "filename": "create_handoff.md",
         "frontmatter": {
           "description": "Create handoff document for transferring work to another session",
-          "model": "opus 4.6"
+          "model": "opus"
         }
       },
       "opencode": [
@@ -925,7 +925,7 @@
         "filename": "create_plan.md",
         "frontmatter": {
           "description": "Create detailed implementation plans through interactive research and iteration",
-          "model": "opus 4.6"
+          "model": "opus"
         }
       },
       "opencode": [
@@ -1064,7 +1064,7 @@
         "filename": "research_codebase_nt.md",
         "frontmatter": {
           "description": "Document codebase as-is without evaluation or recommendations",
-          "model": "opus 4.6"
+          "model": "opus"
         }
       },
       "opencode": [
@@ -1130,7 +1130,7 @@
         "filename": "security_review.md",
         "frontmatter": {
           "description": "Run a Semgrep-powered security review on specific features or the full project — produces severity-rated findings with remediation guidance",
-          "model": "opus 4.6"
+          "model": "opus"
         }
       },
       "opencode": [

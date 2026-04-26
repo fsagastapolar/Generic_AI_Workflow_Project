@@ -1,11 +1,20 @@
-## AI Quick Routes
+# AI Quick Routes
 
-From the project root:
+Single source of truth for all agents and commands lives at the repo root:
 
-- Agents folder: `Agents/`
-- Commands folder: `Commands/`
+- **Agents (canonical bodies):** `Agents/`
+- **Commands (canonical bodies):** `Commands/`
+- **Per-platform frontmatter (manifest):** `agent-build/manifest.json`
+- **Build script:** `agent-build/build.mjs`
+- **Workflow docs:** `agent-build/README.md`
 
-Absolute workspace paths:
+The generated platform files in `.claude/` and `.opencode/` are produced by
+`npm run build:agents`. **Never edit them by hand** — your changes will be
+overwritten on the next build. Edit the canonical body in `Agents/` or
+`Commands/` and re-run the build.
 
-- `/home/fernandosagasta/PolarCode/Generic_AI_Workflow_Project/Agents/`
-- `/home/fernandosagasta/PolarCode/Generic_AI_Workflow_Project/Commands/`
+To verify generated files are in sync:
+
+```bash
+npm run build:agents:check
+```

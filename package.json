@@ -1,5 +1,14 @@
 {
   "name": "generic-ai-workflow-project",
+  "scripts": {
+    "build:agents": "node agent-build/build.mjs",
+    "build:agents:check": "node agent-build/build.mjs --check",
+    "build:agents:verbose": "node agent-build/build.mjs --verbose",
+    "build:agents:prune": "node agent-build/build.mjs --prune",
+    "build:agents:gh": "node agent-build/build.mjs --opencode=gh",
+    "build:agents:glm": "node agent-build/build.mjs --opencode=glm",
+    "agents:extract": "node agent-build/extract-manifest.mjs"
+  },
   "devDependencies": {
     "@playwright/mcp": "^0.0.56"
   }

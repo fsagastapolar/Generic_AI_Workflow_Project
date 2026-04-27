@@ -1,6 +1,6 @@
 ---
 description: Analyzes codebase implementation details. Call the codebase-analyzer agent when you need to find detailed information about specific components. As always, the more detailed your request prompt, the better! :)
-model: github-copilot/claude-sonnet-4.5
+model: github-copilot/claude-sonnet-4.6
 mode: subagent
 permission:
   edit: deny

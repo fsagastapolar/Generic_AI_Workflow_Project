@@ -1,6 +1,6 @@
 ---
 description: Manages Linear tickets and projects. Use this agent to create issues, update states, assign tickets, add comments, list issues by team/project/status, and manage workflows. Calls the Linear GraphQL API directly via curl — no MCP server required.
-model: github-copilot/claude-sonnet-4.5
+model: github-copilot/claude-sonnet-4.6
 mode: subagent
 permission:
   edit: deny

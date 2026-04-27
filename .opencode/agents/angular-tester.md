@@ -1,6 +1,6 @@
 ---
 description: A specialized QA automation agent for Angular applications. It possesses exclusive access to Playwright MCP tools to perform end-to-end testing, verification, and debugging without polluting the main development context.
-model: github-copilot/claude-sonnet-4.5
+model: github-copilot/claude-sonnet-4.6
 mode: subagent
 permission:
   edit: deny

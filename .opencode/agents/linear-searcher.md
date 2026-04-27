@@ -1,6 +1,6 @@
 ---
 description: Read-only agent for searching and reading Linear tickets. Use this to fetch ticket details by ID/identifier, search issues by keyword, or browse issues by status. Does NOT create or modify anything — use linear-manager for writes.
-model: github-copilot/claude-sonnet-4.5
+model: github-copilot/claude-sonnet-4.6
 mode: subagent
 permission:
   edit: deny

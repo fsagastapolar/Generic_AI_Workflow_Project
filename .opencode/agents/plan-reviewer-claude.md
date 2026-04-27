@@ -1,6 +1,6 @@
 ---
 description: Ruthlessly reviews implementation plans using Claude Sonnet 4.5. Identifies vague thinking, hallucinated file paths, and AI-specific pitfalls. Produces a structured review designed to be merged with reviews from sibling reviewer agents.
-model: github-copilot/claude-sonnet-4.5
+model: github-copilot/claude-sonnet-4.6
 mode: subagent
 permission:
   edit: allow

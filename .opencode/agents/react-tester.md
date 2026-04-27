@@ -1,6 +1,6 @@
 ---
 description: A specialized QA automation agent for React applications. It possesses exclusive access to Playwright MCP tools to perform E2E testing, component verification, and debugging without polluting the main development context. Leverages the accessibility tree for resilient, semantic-based testing.
-model: github-copilot/claude-sonnet-4.5
+model: github-copilot/claude-sonnet-4.6
 mode: subagent
 permission:
   edit: deny

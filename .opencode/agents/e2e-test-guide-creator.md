@@ -1,6 +1,6 @@
 ---
 description: Specialist agent for creating comprehensive API/E2E test guides with ready-to-run curl commands, seeded data IDs, SQL queries, and docker exec commands. Designed to minimize QA tester effort by providing complete, copy-paste-ready test instructions.
-model: github-copilot/claude-sonnet-4.5
+model: github-copilot/claude-sonnet-4.6
 mode: subagent
 permission:
   edit: deny

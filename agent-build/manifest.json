@@ -16,7 +16,7 @@
           "filename": "angular-tester.md",
           "frontmatter": {
             "description": "A specialized QA automation agent for Angular applications. It possesses exclusive access to Playwright MCP tools to perform end-to-end testing, verification, and debugging without polluting the main development context.",
-            "model": "github-copilot/claude-sonnet-4.5",
+            "model": "github-copilot/claude-sonnet-4.6",
             "tools": "browser_navigate, browser_navigate_back, browser_reload, browser_click, browser_fill, browser_select_option, browser_hover, browser_screenshot, browser_console_messages, browser_evaluate, browser_wait, browser_snapshot, bash,read_file",
             "disallowedTools": "edit_file, browser_install, browser_launch_options"
           }
@@ -55,7 +55,7 @@
           "frontmatter": {
             "description": "Analyzes codebase implementation details. Call the codebase-analyzer agent when you need to find detailed information about specific components. As always, the more detailed your request prompt, the better! :)",
             "tools": "Read, Grep, Glob, LS",
-            "model": "github-copilot/claude-sonnet-4.5"
+            "model": "github-copilot/claude-sonnet-4.6"
           }
         },
         {
@@ -90,7 +90,7 @@
           "frontmatter": {
             "description": "Locates files, directories, and components relevant to a feature or task. Call `codebase-locator` with human language prompt describing what you're looking for. Basically a \"Super Grep/Glob/LS tool\" — Use it if you find yourself desiring to use one of these tools more than once.",
             "tools": "Grep, Glob, LS",
-            "model": "github-copilot/claude-sonnet-4.5"
+            "model": "github-copilot/claude-sonnet-4.6"
           }
         },
         {
@@ -125,7 +125,7 @@
           "frontmatter": {
             "description": "codebase-pattern-finder is a useful subagent_type for finding similar implementations, usage examples, or existing patterns that can be modeled after. It will give you concrete code examples based on what you're looking for! It's sorta like codebase-locator, but it will not only tell you the location of files, it will also give you code details!",
             "tools": "Grep, Glob, Read, LS",
-            "model": "github-copilot/claude-sonnet-4.5"
+            "model": "github-copilot/claude-sonnet-4.6"
           }
         },
         {
@@ -159,7 +159,7 @@
           "filename": "e2e-test-guide-creator.md",
           "frontmatter": {
             "description": "Specialist agent for creating comprehensive API/E2E test guides with ready-to-run curl commands, seeded data IDs, SQL queries, and docker exec commands. Designed to minimize QA tester effort by providing complete, copy-paste-ready test instructions.",
-            "model": "github-copilot/claude-sonnet-4.5",
+            "model": "github-copilot/claude-sonnet-4.6",
             "tools": "Read, Grep, Glob, LS, bash"
           }
         },
@@ -233,7 +233,7 @@
           "frontmatter": {
             "description": "Manages Linear tickets and projects. Use this agent to create issues, update states, assign tickets, add comments, list issues by team/project/status, and manage workflows. Calls the Linear GraphQL API directly via curl — no MCP server required.",
             "tools": "Bash, Read",
-            "model": "github-copilot/claude-sonnet-4.5"
+            "model": "github-copilot/claude-sonnet-4.6"
           }
         },
         {
@@ -268,7 +268,7 @@
           "frontmatter": {
             "description": "Read-only agent for searching and reading Linear tickets. Use this to fetch ticket details by ID/identifier, search issues by keyword, or browse issues by status. Does NOT create or modify anything — use linear-manager for writes.",
             "tools": "Bash, Read",
-            "model": "github-copilot/claude-sonnet-4.5"
+            "model": "github-copilot/claude-sonnet-4.6"
           }
         },
         {
@@ -354,7 +354,7 @@
           "filename": "plan-reviewer-claude.md",
           "frontmatter": {
             "description": "Ruthlessly reviews implementation plans using Claude Sonnet 4.5. Identifies vague thinking, hallucinated file paths, and AI-specific pitfalls. Produces a structured review designed to be merged with reviews from sibling reviewer agents.",
-            "model": "github-copilot/claude-sonnet-4.5",
+            "model": "github-copilot/claude-sonnet-4.6",
             "mode": "subagent",
             "permission": {
               "edit": "allow",
@@ -549,7 +549,7 @@
           "filename": "react-tester.md",
           "frontmatter": {
             "description": "A specialized QA automation agent for React applications. It possesses exclusive access to Playwright MCP tools to perform E2E testing, component verification, and debugging without polluting the main development context. Leverages the accessibility tree for resilient, semantic-based testing.",
-            "model": "github-copilot/claude-sonnet-4.5",
+            "model": "github-copilot/claude-sonnet-4.6",
             "tools": "browser_navigate, browser_navigate_back, browser_reload, browser_click, browser_fill, browser_select_option, browser_hover, browser_screenshot, browser_console_messages, browser_evaluate, browser_wait, browser_snapshot, bash, read_file",
             "disallowedTools": "edit_file, browser_install, browser_launch_options"
           }
@@ -736,7 +736,7 @@
           "frontmatter": {
             "description": "The research equivalent of codebase-analyzer. Use this subagent_type when wanting to deep dive on a research topic. Not commonly needed otherwise.",
             "tools": "Read, Grep, Glob, LS",
-            "model": "github-copilot/claude-sonnet-4.5"
+            "model": "github-copilot/claude-sonnet-4.6"
           }
         },
         {
@@ -771,7 +771,7 @@
           "frontmatter": {
             "description": "Discovers relevant documents in thoughts/ directory (We use this for all sorts of metadata storage!). This is really only relevant/needed when you're in a reseaching mood and need to figure out if we have random thoughts written down that are relevant to your current research task. Based on the name, I imagine you can guess this is the `thoughts` equivilent of `codebase-locator`",
             "tools": "Grep, Glob, LS",
-            "model": "github-copilot/claude-sonnet-4.5"
+            "model": "github-copilot/claude-sonnet-4.6"
           }
         },
         {
@@ -806,7 +806,7 @@
           "filename": "vue-tester.md",
           "frontmatter": {
             "description": "A specialized QA automation agent for Vue.js applications. It possesses exclusive access to Playwright MCP tools to perform E2E testing, component testing, verification, and debugging without polluting the main development context.",
-            "model": "github-copilot/claude-sonnet-4.5",
+            "model": "github-copilot/claude-sonnet-4.6",
             "tools": "browser_navigate, browser_navigate_back, browser_reload, browser_click, browser_fill, browser_select_option, browser_hover, browser_screenshot, browser_console_messages, browser_evaluate, browser_wait, browser_snapshot, bash, read_file",
             "disallowedTools": "edit_file, browser_install, browser_launch_options"
           }
@@ -847,7 +847,7 @@
             "description": "Do you find yourself desiring information that you don't quite feel well-trained (confident) on? Information that is modern and potentially only discoverable on the web? Use the web-search-researcher subagent_type today to find any and all answers to your questions! It will research deeply to figure out and attempt to answer your questions! If you aren't immediately satisfied you can get your money back! (Not really - but you can re-run web-search-researcher with an altered prompt in the event you're not satisfied the first time)",
             "tools": "WebSearch, WebFetch, TodoWrite, Read, Grep, Glob, LS",
             "color": "yellow",
-            "model": "github-copilot/claude-sonnet-4.5"
+            "model": "github-copilot/claude-sonnet-4.6"
           }
         },
         {

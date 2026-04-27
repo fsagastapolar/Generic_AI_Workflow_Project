@@ -1,6 +1,6 @@
 ---
-description: Ruthlessly reviews implementation plans using Gemini 3.1 Pro. Brings deep, long-context analysis and architectural pattern detection. One of three independent reviewers whose output feeds the consolidator.
-model: github-copilot/gemini-3.1-pro-preview
+description: Ruthlessly reviews implementation plans using Gemini 2.5 Pro. Brings deep, long-context analysis and architectural pattern detection. One of three independent reviewers whose output feeds the consolidator.
+model: github-copilot/gemini-2.5-pro
 mode: subagent
 permission:
   edit: allow

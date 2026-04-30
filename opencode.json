@@ -48,6 +48,12 @@
       "model": "zai-coding-plan/glm-5.1",
       "hidden": true
     },
+    "linear-workflow": {
+      "description": "Orchestrates Linear lifecycle — state transitions, comments, phase tracking",
+      "mode": "subagent",
+      "model": "zai-coding-plan/glm-5.1",
+      "hidden": true
+    },
     "linear-searcher": {
       "description": "Read-only Linear agent — search and fetch ticket details by ID, keyword, or status",
       "mode": "subagent",

@@ -223,6 +223,19 @@ const manifest = JSON.parse(
   fs.readFileSync(path.join(__dirname, 'manifest.json'), 'utf8')
 );
 
+const projectConfigPath = path.join(ROOT, 'project.config.json');
+let linearEnabled = true;
+if (fs.existsSync(projectConfigPath)) {
+  try {
+    const projectConfig = JSON.parse(fs.readFileSync(projectConfigPath, 'utf8'));
+    linearEnabled = projectConfig.linear?.enabled !== false;
+  } catch {
+    linearEnabled = true;
+  }
+}
+
+const LINEAR_AGENTS = new Set(['linear-manager', 'linear-searcher', 'linear-workflow']);
+
 const expectedFiles = {
   '.claude/agents': new Set(),
   '.claude/commands': new Set(),
@@ -233,6 +246,10 @@ const expectedFiles = {
 for (const [section, dirs] of Object.entries(TARGETS)) {
   const entries = manifest[section] || {};
   for (const [canonicalName, spec] of Object.entries(entries)) {
+    if (section === 'agents' && LINEAR_AGENTS.has(canonicalName) && !linearEnabled) {
+      if (VERBOSE) console.log(`  skip  ${canonicalName} (Linear disabled in project.config.json)`);
+      continue;
+    }
     const canonicalPath = path.join(ROOT, dirs.canonicalDir, `${canonicalName}.md`);
     if (!fs.existsSync(canonicalPath)) {
       console.error(`! missing canonical: ${dirs.canonicalDir}/${canonicalName}.md`);

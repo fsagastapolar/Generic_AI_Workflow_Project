@@ -16,26 +16,14 @@ You are tasked with validating that an implementation plan was correctly execute
 
 **Commands own the conversation. Agents own the work.**
 
-## Agent Dispatch Protocol (Cost Optimization)
+---
 
-Try the cheaper OpenCode agent first; fall back to Claude if it fails:
+## Config Read (At Startup)
 
-```bash
-TMPFILE=$(mktemp /tmp/opencode_dispatch_XXXXXX.json)
-timeout 120 opencode run --agent "plan-validator" --format json "<prompt>" > "$TMPFILE" 2>&1
-EXIT_CODE=$?
-RESULT=$(grep '"type":"text"' "$TMPFILE" | jq -r '.part.text // empty' 2>/dev/null)
-RESULT_LEN=${#RESULT}
-HAS_ERROR=$(grep -ciE "(token limit|rate limit|context length exceeded|quota exceeded|ECONNREFUSED)" "$TMPFILE" || true)
-rm -f "$TMPFILE"
-if [ $EXIT_CODE -ne 0 ] || [ $RESULT_LEN -lt 50 ] || [ "$HAS_ERROR" -gt 0 ]; then
-  echo "OPENCODE_FALLBACK_NEEDED"
-else
-  echo "$RESULT"
-fi
-```
-
-If `OPENCODE_FALLBACK_NEEDED`, spawn the Claude `plan-validator` agent via Task tool.
+1. Read `project.config.json` from the repository root
+2. Set `LINEAR_ENABLED = config.linear?.enabled === true`
+3. Set `GUIDELINES_PATH = config.project?.guidelinesPath || '.claude/project_guidelines.md'`
+4. If the config file does not exist, proceed with defaults: `LINEAR_ENABLED = false`, `GUIDELINES_PATH = '.claude/project_guidelines.md'`
 
 ---
 
@@ -48,40 +36,8 @@ If plan path provided, use it. Otherwise:
 Read the plan file and extract:
 - The `## Linear Integration` section (Issue UUID, identifier, title)
 - All phases and success criteria
-- If Linear Integration exists, this command has **automatic Linear tracking**
 
-### Linear Credentials & Setup
-```bash
-source "$(git rev-parse --show-toplevel)/.env"
-```
-
-### Workflow State Resolution
-State UUIDs are workspace-specific. Resolve them dynamically:
-```bash
-curl -s -X POST https://api.linear.app/graphql \
-  -H "Authorization: $LINEAR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"query": "query { team(id: \"'$LINEAR_TEAM_ID'\") { states { nodes { id name type } } } }"}' | jq '.data.team.states.nodes[] | "\(.name) → \(.id)"'
-```
-
-### Linear API Patterns
-**Move ticket:** Use the resolved state UUID:
-```bash
-curl -s -X POST https://api.linear.app/graphql \
-  -H "Authorization: $LINEAR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"query":"mutation IssueUpdate($id:String!,$input:IssueUpdateInput!){issueUpdate(id:$id,input:$input){success issue{identifier state{name}}}}","variables":{"id":"ISSUE_UUID","input":{"stateId":"STATE_UUID"}}}' | jq .
-```
-
-**Add comment:**
-```bash
-curl -s -X POST https://api.linear.app/graphql \
-  -H "Authorization: $LINEAR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"query":"mutation CommentCreate($input:CommentCreateInput!){commentCreate(input:$input){success}}","variables":{"input":{"issueId":"ISSUE_UUID","body":"COMMENT"}}}' | jq .
-```
-
-**Do not let Linear API failures block validation.**
+If Linear Integration exists AND `LINEAR_ENABLED` is true, this command has **automatic Linear tracking**.
 
 ### Determine AI Model Identity
 
@@ -98,10 +54,10 @@ Ask the user which phases to validate:
 
 ## Step 3: Invoke `plan-validator` Agent
 
-Spawn the `plan-validator` agent (via dispatch protocol) with:
+Spawn the `plan-validator` agent via Task tool with:
 - **Plan path**: The plan to validate
 - **Scope**: Which phases (from Step 2)
-- **Project guidelines path**: `.claude/project_guidelines.md`
+- **Project guidelines path**: from `GUIDELINES_PATH` (read from config)
 
 The agent will:
 - Read the full plan
@@ -131,43 +87,26 @@ For each fixable issue, explain what needs to change and ask if you should proce
 
 ## Step 6: Linear Validation Logging (If Linear Tracking Active)
 
-After validation completes (regardless of pass/fail), post a validation comment on the Linear issue:
+If `LINEAR_ENABLED` AND the plan has a `## Linear Integration` section with an Issue UUID:
 
-**On validation start**: Comment: `🔍 **[AI Model] Validation Log** — AI validation started for plan \`<plan-path>\`. Scope: [phases].`
+Invoke `linear-workflow` agent via Task tool with action `validate` and appropriate sub-action:
 
-**On validation complete (pass)**: Comment:
-```
-✅ **[AI Model] Validation Log** — Validation PASSED.
+1. **On validation start** → `linear-workflow` with sub-action `start`
+2. **On validation complete (pass)** → `linear-workflow` with sub-action `pass`
+3. **On validation complete (issues found)** → `linear-workflow` with sub-action `fail`
 
-**AI Model**: [e.g., Claude Sonnet 4 / GLM-5.1]
-**Scope**: [phases validated]
-**Automated checks**: All passed
-**Deviations**: [None / list]
-**Blockers**: None
+Pass to `linear-workflow`: action, sub-action, issue UUID, config snapshot, AI model identity, validation data (scope, checks, blockers, deviations).
 
-Implementation ready for QA testing.
-```
+If `LINEAR_ENABLED` is false or plan has no Linear Integration: skip all Linear steps.
 
-**On validation complete (issues found)**: Comment:
-```
-⚠️ **[AI Model] Validation Log** — Validation completed with issues.
-
-**AI Model**: [e.g., Claude Sonnet 4 / GLM-5.1]
-**Scope**: [phases validated]
-**Automated checks**: [X passed, Y failed]
-**Blockers**: [list]
-**Deviations**: [list]
-**Recommendations**: [must-fix items]
-
-Issues need to be resolved before QA.
-```
+**Linear failures must never block validation.** If `linear-workflow` returns a warning, log it and continue.
 
 ## Step 7: Testing Guide Creation for QA
 
 If validation passes (or issues are accepted), create testing guides for the QA tester:
 
 1. Gather commit hash: `git rev-parse --short HEAD`
-2. Invoke the `testing-guide-orchestrator` agent (via dispatch protocol) with:
+2. Invoke the `testing-guide-orchestrator` agent via Task tool with:
    - Implementation summary
    - Files changed (from `git diff`)
    - Plan reference
@@ -177,42 +116,17 @@ The testing guides will be attached to the Linear issue in the next step.
 
 ## Step 8: Move to QA & Post Testing Info (If Linear Tracking Active)
 
-If validation passed (or user accepted issues):
+If validation passed (or user accepted issues) AND Linear tracking is active:
 
-1. **Move ticket to QA** status
-2. **Post QA handoff comment** with all testing information:
+Invoke `linear-workflow` agent via Task tool with action `validate`, sub-action `qa`, passing:
+- Issue UUID, config snapshot, commit hash, branch, plan path
+- Testing guide paths and summaries
+- What changed (files modified/created)
+- Manual verification steps
+- Known issues / deviations
+- QA focus areas
 
-```
-🧪 **QA Handoff** — Ready for manual testing.
-
-**Commit**: `<short-hash>` (`<full-hash>`)
-**Branch**: `<branch-name>`
-**Plan**: `<plan-path>`
-
-## Testing Guides
-- **API E2E Guide**: `[path]` — [summary]
-- **Frontend Test Spec**: `[path]` — [summary]
-- **Manual Test Guide**: `[path]` — [summary]
-
-## What Changed
-- [List of key files modified/created]
-- [Key functionality added/changed]
-
-## Manual Verification Steps
-1. [Step from validation report]
-2. [Step from validation report]
-
-## Known Issues / Deviations
-- [Any deviations or known issues, or "None"]
-
-## QA Focus Areas
-- [Specific areas that need careful manual testing]
-- [Edge cases to verify]
-```
-
-3. If any testing guide creation failed, note it in the comment and provide inline manual steps.
-
-If validation failed with blockers: Keep ticket in **Validation** status. Do NOT move to QA until issues are resolved.
+If validation failed with blockers: `linear-workflow` keeps ticket in **Validation** status. Do NOT move to QA until issues are resolved.
 
 ---
 

@@ -19,28 +19,14 @@ You are tasked with implementing an approved technical plan from `thoughts/share
 - When fixing a bug, fix the root cause, not the symptom.
 - If something I asked for requires error handling or validation to work reliably, include it without asking.
 
-## Agent Dispatch Protocol (Cost Optimization)
+---
 
-When spawning any of the following agents, try the cheaper OpenCode agent first; fall back to Claude if it fails:
+## Config Read (At Startup)
 
-**Agents with OpenCode counterparts:** `phase-executor`, `testing-guide-orchestrator`, `e2e-test-guide-creator`, `linear-manager`
-
-```bash
-TMPFILE=$(mktemp /tmp/opencode_dispatch_XXXXXX.json)
-timeout 120 opencode run --agent "<agent-name>" --format json "<prompt>" > "$TMPFILE" 2>&1
-EXIT_CODE=$?
-RESULT=$(grep '"type":"text"' "$TMPFILE" | jq -r '.part.text // empty' 2>/dev/null)
-RESULT_LEN=${#RESULT}
-HAS_ERROR=$(grep -ciE "(token limit|rate limit|context length exceeded|quota exceeded|ECONNREFUSED)" "$TMPFILE" || true)
-rm -f "$TMPFILE"
-if [ $EXIT_CODE -ne 0 ] || [ $RESULT_LEN -lt 50 ] || [ "$HAS_ERROR" -gt 0 ]; then
-  echo "OPENCODE_FALLBACK_NEEDED"
-else
-  echo "$RESULT"
-fi
-```
-
-If `OPENCODE_FALLBACK_NEEDED`, spawn the equivalent Claude agent via Task tool.
+1. Read `project.config.json` from the repository root
+2. Set `LINEAR_ENABLED = config.linear?.enabled === true`
+3. Set `GUIDELINES_PATH = config.project?.guidelinesPath || '.claude/project_guidelines.md'`
+4. If the config file does not exist, proceed with defaults: `LINEAR_ENABLED = false`, `GUIDELINES_PATH = '.claude/project_guidelines.md'`
 
 ---
 
@@ -50,57 +36,28 @@ When given a plan path:
 - Read the plan completely and check for any existing checkmarks (- [x])
 - Read the original ticket and all files mentioned in the plan
 - **Read files fully** - never use limit/offset parameters
-- **Check for `## Linear Integration` section** — if present, follow the Linear Lifecycle Protocol below
+- **Check for `## Linear Integration` section** — if present, extract the Issue UUID
 - Create a todo list to track your progress
 - If no plan path provided, ask for one
 
-## Linear Lifecycle Protocol (Always-On)
+## Linear Integration
 
-If the plan contains a `## Linear Integration` section with an Issue UUID, Linear tracking is **automatically enabled**.
+If `LINEAR_ENABLED` is true:
 
-### Credentials & Setup
-```bash
-source "$(git rev-parse --show-toplevel)/.env"
-```
+1. **If the plan contains a `## Linear Integration` section with an Issue UUID**:
+   - After branch selection → invoke `linear-workflow` agent via Task tool with action `implement_start`
+   - After each phase → invoke `linear-workflow` with action `implement_progress`
+   - After all phases complete → invoke `linear-workflow` with action `implement_complete`
+   - Pass to `linear-workflow`: action, issue UUID, config snapshot (team ID, project ID, workflow states), and relevant data (branch, plan path, phase, summary)
 
-### Workflow State Resolution
-State UUIDs are workspace-specific. Resolve them dynamically:
-```bash
-curl -s -X POST https://api.linear.app/graphql \
-  -H "Authorization: $LINEAR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"query": "query { team(id: \"'$LINEAR_TEAM_ID'\") { states { nodes { id name type } } } }"}' | jq '.data.team.states.nodes[] | "\(.name) → \(.id)"'
-```
+2. **If the plan has NO `## Linear Integration` section**:
+   - Prompt the user: "Linear is enabled but this plan has no linked ticket. Create one?"
+   - If yes → invoke `linear-manager` agent to create a ticket, then embed the `## Linear Integration` section in the plan
+   - If no → proceed without Linear tracking
 
-Cache the state name→UUID mapping for the session.
+If `LINEAR_ENABLED` is false: skip all Linear invocations entirely.
 
-### State Transitions
-**On start** (after branch selection): Move to **In Progress**, comment: `🤖 **AI Implementation Log** — Implementation started on branch \`<branch>\`. Plan: \`<path>\``
-
-**After each phase**: Comment: `🤖 **AI Implementation Log** — Phase N: [Name] completed. [Summary]`
-
-**On difficulties**: Comment: `🤖 **AI Implementation Log** — ⚠️ [Description]. [Resolution]`
-
-**On complete**: Move ticket to **Validation**, comment: `🤖 **AI Implementation Log** — All phases completed. Implementation moving to AI validation. Summary: [brief summary of what was implemented]`
-
-### API Patterns
-**Move ticket:** Use the resolved state UUID:
-```bash
-curl -s -X POST https://api.linear.app/graphql \
-  -H "Authorization: $LINEAR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"query":"mutation IssueUpdate($id:String!,$input:IssueUpdateInput!){issueUpdate(id:$id,input:$input){success issue{identifier state{name}}}}","variables":{"id":"ISSUE_UUID","input":{"stateId":"STATE_UUID"}}}' | jq .
-```
-
-**Add comment:**
-```bash
-curl -s -X POST https://api.linear.app/graphql \
-  -H "Authorization: $LINEAR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"query":"mutation CommentCreate($input:CommentCreateInput!){commentCreate(input:$input){success}}","variables":{"input":{"issueId":"ISSUE_UUID","body":"COMMENT"}}}' | jq .
-```
-
-**Do not let Linear API failures block implementation.**
+**Linear failures must never block implementation.** If `linear-workflow` returns a warning, log it and continue.
 
 ---
 
@@ -109,7 +66,7 @@ curl -s -X POST https://api.linear.app/graphql \
 1. Run `git branch --show-current`
 2. Ask the user: Stay on current / Branch out from current (suggest name) / Custom branch
 3. Create branch if needed
-4. If Linear tracking active: move to In Progress, post start comment
+4. If Linear tracking active: invoke `linear-workflow` with `implement_start` action
 
 ---
 
@@ -119,10 +76,10 @@ For each phase in the plan:
 
 ### 1. Invoke `phase-executor` Agent
 
-Spawn the `phase-executor` agent (via dispatch protocol) with:
+Spawn the `phase-executor` agent via Task tool with:
 - Plan path
 - Phase number
-- Project guidelines path: `.claude/project_guidelines.md`
+- Project guidelines path: from `GUIDELINES_PATH` (read from config)
 - Context from previous phases (accumulate as you go)
 
 ### 2. Review Results
@@ -182,7 +139,7 @@ After ALL phases complete and automated verification passes, ask the user:
 - **Yes, create a testing guide**
 - **No, skip the guide**
 
-If yes, invoke the `testing-guide-orchestrator` agent (via dispatch protocol) with:
+If yes, invoke the `testing-guide-orchestrator` agent via Task tool with:
 - Implementation summary
 - Files changed (from `git diff`)
 - Plan reference
@@ -191,7 +148,7 @@ If yes, invoke the `testing-guide-orchestrator` agent (via dispatch protocol) wi
 
 ## Linear Finalization
 
-If Linear tracking is active, move ticket to **Validation** status and post a completion summary comment. Do NOT move to Done — that happens after `/validate_plan` succeeds. The ticket flow is: In Progress → Validation → QA → Done.
+If Linear tracking is active, invoke `linear-workflow` with `implement_complete` action. The agent will move ticket to **Validation** status and post a completion summary comment. Do NOT move to Done — that happens after `/validate_plan` succeeds. The ticket flow is: In Progress → Validation → QA → Done.
 
 ---
 

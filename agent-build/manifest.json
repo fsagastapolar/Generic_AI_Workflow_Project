@@ -252,6 +252,41 @@
         }
       ]
     },
+    "linear-workflow": {
+      "claude": {
+        "filename": "linear-workflow.md",
+        "frontmatter": {
+          "name": "linear-workflow",
+          "description": "Orchestrates Linear lifecycle during implementation and validation — state transitions, lifecycle comments, phase progress. Delegates raw API calls to linear-manager.",
+          "tools": "Bash, Read",
+          "model": "sonnet"
+        }
+      },
+      "opencode": [
+        {
+          "filename": "linear-workflow.md",
+          "frontmatter": {
+            "description": "Orchestrates Linear lifecycle during implementation and validation — state transitions, lifecycle comments, phase progress.",
+            "tools": "Bash, Read",
+            "model": "github-copilot/claude-sonnet-4.6"
+          }
+        },
+        {
+          "filename": "linear-workflow_GLM.md",
+          "frontmatter": {
+            "description": "Orchestrates Linear lifecycle — state transitions, lifecycle comments, phase tracking.",
+            "model": "zai-coding-plan/glm-5.1",
+            "mode": "subagent",
+            "permission": {
+              "edit": "deny",
+              "write": "deny",
+              "bash": "allow",
+              "webfetch": "deny"
+            }
+          }
+        }
+      ]
+    },
     "linear-searcher": {
       "claude": {
         "filename": "linear-searcher.md",

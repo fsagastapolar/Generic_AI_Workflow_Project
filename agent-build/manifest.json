@@ -17,8 +17,13 @@
           "frontmatter": {
             "description": "A specialized QA automation agent for Angular applications. It possesses exclusive access to Playwright MCP tools to perform end-to-end testing, verification, and debugging without polluting the main development context.",
             "model": "github-copilot/claude-sonnet-4.6",
-            "tools": "browser_navigate, browser_navigate_back, browser_reload, browser_click, browser_fill, browser_select_option, browser_hover, browser_screenshot, browser_console_messages, browser_evaluate, browser_wait, browser_snapshot, bash,read_file",
-            "disallowedTools": "edit_file, browser_install, browser_launch_options"
+            "mode": "subagent",
+            "permission": {
+              "edit": "deny",
+              "write": "deny",
+              "bash": "allow",
+              "webfetch": "deny"
+            }
           }
         },
         {
@@ -54,8 +59,14 @@
           "filename": "codebase-analyzer.md",
           "frontmatter": {
             "description": "Analyzes codebase implementation details. Call the codebase-analyzer agent when you need to find detailed information about specific components. As always, the more detailed your request prompt, the better! :)",
-            "tools": "Read, Grep, Glob, LS",
-            "model": "github-copilot/claude-sonnet-4.6"
+            "model": "github-copilot/claude-sonnet-4.6",
+            "mode": "subagent",
+            "permission": {
+              "edit": "deny",
+              "write": "deny",
+              "bash": "deny",
+              "webfetch": "deny"
+            }
           }
         },
         {
@@ -89,8 +100,14 @@
           "filename": "codebase-locator.md",
           "frontmatter": {
             "description": "Locates files, directories, and components relevant to a feature or task. Call `codebase-locator` with human language prompt describing what you're looking for. Basically a \"Super Grep/Glob/LS tool\" — Use it if you find yourself desiring to use one of these tools more than once.",
-            "tools": "Grep, Glob, LS",
-            "model": "github-copilot/claude-sonnet-4.6"
+            "model": "github-copilot/claude-sonnet-4.6",
+            "mode": "subagent",
+            "permission": {
+              "edit": "deny",
+              "write": "deny",
+              "bash": "deny",
+              "webfetch": "deny"
+            }
           }
         },
         {
@@ -124,8 +141,14 @@
           "filename": "codebase-pattern-finder.md",
           "frontmatter": {
             "description": "codebase-pattern-finder is a useful subagent_type for finding similar implementations, usage examples, or existing patterns that can be modeled after. It will give you concrete code examples based on what you're looking for! It's sorta like codebase-locator, but it will not only tell you the location of files, it will also give you code details!",
-            "tools": "Grep, Glob, Read, LS",
-            "model": "github-copilot/claude-sonnet-4.6"
+            "model": "github-copilot/claude-sonnet-4.6",
+            "mode": "subagent",
+            "permission": {
+              "edit": "deny",
+              "write": "deny",
+              "bash": "deny",
+              "webfetch": "deny"
+            }
           }
         },
         {
@@ -160,7 +183,13 @@
           "frontmatter": {
             "description": "Specialist agent for creating comprehensive API/E2E test guides with ready-to-run curl commands, seeded data IDs, SQL queries, and docker exec commands. Designed to minimize QA tester effort by providing complete, copy-paste-ready test instructions.",
             "model": "github-copilot/claude-sonnet-4.6",
-            "tools": "Read, Grep, Glob, LS, bash"
+            "mode": "subagent",
+            "permission": {
+              "edit": "deny",
+              "write": "deny",
+              "bash": "allow",
+              "webfetch": "deny"
+            }
           }
         },
         {
@@ -195,8 +224,14 @@
           "filename": "frontend-review.md",
           "frontmatter": {
             "description": "Frontend Architect & QA Sentinel. Enforces architectural standards, verifies visual fidelity, and ensures WCAG 2.1 AA compliance on all frontend changes.",
-            "tools": "Read, Grep, Glob, LS, Bash, WebFetch",
-            "model": "github-copilot/gpt-5.3-codex"
+            "model": "github-copilot/gpt-5.3-codex",
+            "mode": "subagent",
+            "permission": {
+              "edit": "deny",
+              "write": "deny",
+              "bash": "allow",
+              "webfetch": "allow"
+            }
           }
         },
         {
@@ -232,15 +267,7 @@
           "filename": "linear-manager.md",
           "frontmatter": {
             "description": "Manages Linear tickets and projects. Use this agent to create issues, update states, assign tickets, add comments, list issues by team/project/status, and manage workflows. Calls the Linear GraphQL API directly via curl — no MCP server required.",
-            "tools": "Bash, Read",
-            "model": "github-copilot/claude-sonnet-4.6"
-          }
-        },
-        {
-          "filename": "linear-manager_GLM.md",
-          "frontmatter": {
-            "description": "Manages Linear tickets and projects. Create issues, update states, assign tickets, add comments, list issues. Calls the Linear GraphQL API directly via curl.",
-            "model": "zai-coding-plan/glm-5.1",
+            "model": "github-copilot/claude-sonnet-4.6",
             "mode": "subagent",
             "permission": {
               "edit": "deny",
@@ -249,32 +276,11 @@
               "webfetch": "deny"
             }
           }
-        }
-      ]
-    },
-    "linear-workflow": {
-      "claude": {
-        "filename": "linear-workflow.md",
-        "frontmatter": {
-          "name": "linear-workflow",
-          "description": "Orchestrates Linear lifecycle during implementation and validation — state transitions, lifecycle comments, phase progress. Delegates raw API calls to linear-manager.",
-          "tools": "Bash, Read",
-          "model": "sonnet"
-        }
-      },
-      "opencode": [
-        {
-          "filename": "linear-workflow.md",
-          "frontmatter": {
-            "description": "Orchestrates Linear lifecycle during implementation and validation — state transitions, lifecycle comments, phase progress.",
-            "tools": "Bash, Read",
-            "model": "github-copilot/claude-sonnet-4.6"
-          }
         },
         {
-          "filename": "linear-workflow_GLM.md",
+          "filename": "linear-manager_GLM.md",
           "frontmatter": {
-            "description": "Orchestrates Linear lifecycle — state transitions, lifecycle comments, phase tracking.",
+            "description": "Manages Linear tickets and projects. Create issues, update states, assign tickets, add comments, list issues. Calls the Linear GraphQL API directly via curl.",
             "model": "zai-coding-plan/glm-5.1",
             "mode": "subagent",
             "permission": {
@@ -302,14 +308,61 @@
           "filename": "linear-searcher.md",
           "frontmatter": {
             "description": "Read-only agent for searching and reading Linear tickets. Use this to fetch ticket details by ID/identifier, search issues by keyword, or browse issues by status. Does NOT create or modify anything — use linear-manager for writes.",
-            "tools": "Bash, Read",
-            "model": "github-copilot/claude-sonnet-4.6"
+            "model": "github-copilot/claude-sonnet-4.6",
+            "mode": "subagent",
+            "permission": {
+              "edit": "deny",
+              "write": "deny",
+              "bash": "allow",
+              "webfetch": "deny"
+            }
           }
         },
         {
           "filename": "linear-searcher_GLM.md",
           "frontmatter": {
             "description": "Read-only agent for searching and reading Linear tickets. Fetch ticket details, search by keyword, browse by status. Does NOT create or modify anything — use linear-manager for writes.",
+            "model": "zai-coding-plan/glm-5.1",
+            "mode": "subagent",
+            "permission": {
+              "edit": "deny",
+              "write": "deny",
+              "bash": "allow",
+              "webfetch": "deny"
+            }
+          }
+        }
+      ]
+    },
+    "linear-workflow": {
+      "claude": {
+        "filename": "linear-workflow.md",
+        "frontmatter": {
+          "name": "linear-workflow",
+          "description": "Orchestrates Linear lifecycle during implementation and validation — state transitions, lifecycle comments, phase progress. Delegates raw API calls to linear-manager.",
+          "tools": "Bash, Read",
+          "model": "sonnet"
+        }
+      },
+      "opencode": [
+        {
+          "filename": "linear-workflow.md",
+          "frontmatter": {
+            "description": "Orchestrates Linear lifecycle during implementation and validation — state transitions, lifecycle comments, phase progress.",
+            "model": "github-copilot/claude-sonnet-4.6",
+            "mode": "subagent",
+            "permission": {
+              "edit": "deny",
+              "write": "deny",
+              "bash": "allow",
+              "webfetch": "deny"
+            }
+          }
+        },
+        {
+          "filename": "linear-workflow_GLM.md",
+          "frontmatter": {
+            "description": "Orchestrates Linear lifecycle — state transitions, lifecycle comments, phase tracking.",
             "model": "zai-coding-plan/glm-5.1",
             "mode": "subagent",
             "permission": {
@@ -337,8 +390,14 @@
           "filename": "phase-executor.md",
           "frontmatter": {
             "description": "Executes a single phase from an implementation plan. Give it the plan path, the phase number, and any context from previous phases. It reads the plan, implements the changes for that specific phase, runs the automated verification, and reports results. Does NOT interact with the user — reports back to the caller.",
-            "tools": "Read, Write, Edit, Grep, Glob, LS, bash, Task",
-            "model": "github-copilot/gpt-5.3-codex"
+            "model": "github-copilot/gpt-5.3-codex",
+            "mode": "subagent",
+            "permission": {
+              "edit": "allow",
+              "write": "allow",
+              "bash": "allow",
+              "webfetch": "deny"
+            }
           }
         },
         {
@@ -511,8 +570,14 @@
           "filename": "plan-validator.md",
           "frontmatter": {
             "description": "Validates that an implementation matches its plan. Compares actual code changes against planned changes, runs verification commands, checks success criteria, and produces a structured validation report. Give it a plan path and it will audit the implementation.",
-            "tools": "Read, Grep, Glob, LS, bash",
-            "model": "github-copilot/gpt-5.3-codex"
+            "model": "github-copilot/gpt-5.3-codex",
+            "mode": "subagent",
+            "permission": {
+              "edit": "deny",
+              "write": "deny",
+              "bash": "allow",
+              "webfetch": "deny"
+            }
           }
         },
         {
@@ -548,8 +613,14 @@
           "filename": "plan-writer.md",
           "frontmatter": {
             "description": "Takes structured input (research brief, user decisions, scope) and produces a complete implementation plan document. Does not interact with the user — it receives finalized decisions and writes the plan file.",
-            "tools": "Read, Grep, Glob, LS, Write, Edit",
-            "model": "github-copilot/gpt-5.3-codex"
+            "model": "github-copilot/gpt-5.3-codex",
+            "mode": "subagent",
+            "permission": {
+              "edit": "allow",
+              "write": "allow",
+              "bash": "deny",
+              "webfetch": "deny"
+            }
           }
         },
         {
@@ -585,8 +656,13 @@
           "frontmatter": {
             "description": "A specialized QA automation agent for React applications. It possesses exclusive access to Playwright MCP tools to perform E2E testing, component verification, and debugging without polluting the main development context. Leverages the accessibility tree for resilient, semantic-based testing.",
             "model": "github-copilot/claude-sonnet-4.6",
-            "tools": "browser_navigate, browser_navigate_back, browser_reload, browser_click, browser_fill, browser_select_option, browser_hover, browser_screenshot, browser_console_messages, browser_evaluate, browser_wait, browser_snapshot, bash, read_file",
-            "disallowedTools": "edit_file, browser_install, browser_launch_options"
+            "mode": "subagent",
+            "permission": {
+              "edit": "deny",
+              "write": "deny",
+              "bash": "allow",
+              "webfetch": "deny"
+            }
           }
         },
         {
@@ -622,8 +698,14 @@
           "filename": "research-gatherer.md",
           "frontmatter": {
             "description": "Orchestrates parallel codebase and thoughts research for a given task or ticket. Give it a task description, ticket content, or feature summary and it will spawn sub-agents to locate files, analyze implementations, find patterns, and surface relevant prior research. Returns a structured research brief with file:line references.",
-            "tools": "Read, Grep, Glob, LS, Task",
-            "model": "github-copilot/gpt-5.3-codex"
+            "model": "github-copilot/gpt-5.3-codex",
+            "mode": "subagent",
+            "permission": {
+              "edit": "deny",
+              "write": "deny",
+              "bash": "deny",
+              "webfetch": "deny"
+            }
           }
         },
         {
@@ -657,8 +739,14 @@
           "filename": "reviewer.md",
           "frontmatter": {
             "description": "specialized backend analysis agent. Use this to make a thorough review of the backend.",
-            "tools": "WebSearch, WebFetch, TodoWrite, Read, Grep, Glob, LS",
-            "model": "github-copilot/gpt-5.3-codex"
+            "model": "github-copilot/gpt-5.3-codex",
+            "mode": "subagent",
+            "permission": {
+              "edit": "deny",
+              "write": "deny",
+              "bash": "deny",
+              "webfetch": "allow"
+            }
           }
         },
         {
@@ -735,8 +823,14 @@
           "filename": "testing-guide-orchestrator.md",
           "frontmatter": {
             "description": "Decides which testing guides are needed based on implementation type (API, frontend, full-stack, infra) and orchestrates their creation by delegating to the appropriate specialist agents (e2e-test-guide-creator, angular-tester, etc). Give it a summary of what was implemented and it handles the rest.",
-            "tools": "Read, Grep, Glob, LS, Task, Write, Edit",
-            "model": "github-copilot/gpt-5.3-codex"
+            "model": "github-copilot/gpt-5.3-codex",
+            "mode": "subagent",
+            "permission": {
+              "edit": "allow",
+              "write": "allow",
+              "bash": "deny",
+              "webfetch": "deny"
+            }
           }
         },
         {
@@ -770,8 +864,14 @@
           "filename": "thoughts-analyzer.md",
           "frontmatter": {
             "description": "The research equivalent of codebase-analyzer. Use this subagent_type when wanting to deep dive on a research topic. Not commonly needed otherwise.",
-            "tools": "Read, Grep, Glob, LS",
-            "model": "github-copilot/claude-sonnet-4.6"
+            "model": "github-copilot/claude-sonnet-4.6",
+            "mode": "subagent",
+            "permission": {
+              "edit": "deny",
+              "write": "deny",
+              "bash": "deny",
+              "webfetch": "deny"
+            }
           }
         },
         {
@@ -805,8 +905,14 @@
           "filename": "thoughts-locator.md",
           "frontmatter": {
             "description": "Discovers relevant documents in thoughts/ directory (We use this for all sorts of metadata storage!). This is really only relevant/needed when you're in a reseaching mood and need to figure out if we have random thoughts written down that are relevant to your current research task. Based on the name, I imagine you can guess this is the `thoughts` equivilent of `codebase-locator`",
-            "tools": "Grep, Glob, LS",
-            "model": "github-copilot/claude-sonnet-4.6"
+            "model": "github-copilot/claude-sonnet-4.6",
+            "mode": "subagent",
+            "permission": {
+              "edit": "deny",
+              "write": "deny",
+              "bash": "deny",
+              "webfetch": "deny"
+            }
           }
         },
         {
@@ -842,8 +948,13 @@
           "frontmatter": {
             "description": "A specialized QA automation agent for Vue.js applications. It possesses exclusive access to Playwright MCP tools to perform E2E testing, component testing, verification, and debugging without polluting the main development context.",
             "model": "github-copilot/claude-sonnet-4.6",
-            "tools": "browser_navigate, browser_navigate_back, browser_reload, browser_click, browser_fill, browser_select_option, browser_hover, browser_screenshot, browser_console_messages, browser_evaluate, browser_wait, browser_snapshot, bash, read_file",
-            "disallowedTools": "edit_file, browser_install, browser_launch_options"
+            "mode": "subagent",
+            "permission": {
+              "edit": "deny",
+              "write": "deny",
+              "bash": "allow",
+              "webfetch": "deny"
+            }
           }
         },
         {
@@ -880,9 +991,15 @@
           "filename": "web-search-researcher.md",
           "frontmatter": {
             "description": "Do you find yourself desiring information that you don't quite feel well-trained (confident) on? Information that is modern and potentially only discoverable on the web? Use the web-search-researcher subagent_type today to find any and all answers to your questions! It will research deeply to figure out and attempt to answer your questions! If you aren't immediately satisfied you can get your money back! (Not really - but you can re-run web-search-researcher with an altered prompt in the event you're not satisfied the first time)",
-            "tools": "WebSearch, WebFetch, TodoWrite, Read, Grep, Glob, LS",
-            "color": "yellow",
-            "model": "github-copilot/claude-sonnet-4.6"
+            "color": "#FFC107",
+            "model": "github-copilot/claude-sonnet-4.6",
+            "mode": "subagent",
+            "permission": {
+              "edit": "deny",
+              "write": "deny",
+              "bash": "deny",
+              "webfetch": "allow"
+            }
           }
         },
         {
@@ -897,7 +1014,7 @@
               "bash": "deny",
               "webfetch": "allow"
             },
-            "color": "yellow"
+            "color": "#FFC107"
           }
         }
       ]
@@ -1157,8 +1274,19 @@
         "frontmatter": {
           "description": "Ruthlessly review an implementation plan before executing it — identifies weak spots, hallucinations, and AI-specific pitfalls"
         }
-      },
-      "opencode": []
+      }
+    },
+    "review_plan_multi_agent": {
+      "opencode": [
+        {
+          "filename": "review_plan_multi_agent.md",
+          "frontmatter": {
+            "description": "Multi-agent plan review — runs 2-3 independent reviewers (Claude, Gemini, Codex) in parallel, then consolidates and dedupes their findings with attribution. GH-only because GLM cannot access multiple model providers.",
+            "agent": "build",
+            "model": "github-copilot/gpt-5.3-codex"
+          }
+        }
+      ]
     },
     "security_review": {
       "claude": {
@@ -1215,18 +1343,16 @@
           }
         }
       ]
-    },
-    "review_plan_multi_agent": {
-      "opencode": [
-        {
-          "filename": "review_plan_multi_agent.md",
-          "frontmatter": {
-            "description": "Multi-agent plan review — runs 2-3 independent reviewers (Claude, Gemini, Codex) in parallel, then consolidates and dedupes their findings with attribution. GH-only because GLM cannot access multiple model providers.",
-            "agent": "build",
-            "model": "github-copilot/gpt-5.3-codex"
-          }
+    }
+  },
+  "skills": {
+    "grill-me": {
+      "opencode": {
+        "frontmatter": {
+          "name": "grill-me",
+          "description": "Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree. Use when user wants to stress-test a plan, get grilled on their design, or mentions \"grill me\"."
         }
-      ]
+      }
     }
   }
 }

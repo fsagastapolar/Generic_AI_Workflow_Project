@@ -1,6 +1,6 @@
 # Agent & Command Build System
 
-Single source of truth for every AI agent and slash command used by both
+Single source of truth for every AI agent, slash command, and skill used by both
 **Claude Code** (`.claude/`) and **OpenCode** (`.opencode/`).
 
 ## Why
@@ -19,6 +19,7 @@ at the repo root, and keeps the **per-platform frontmatter** in
 ```
 Agents/<name>.md         ←  canonical body (no frontmatter, or stripped)
 Commands/<name>.md       ←  canonical body
+Skills/<name>/SKILL.md   ←  canonical body (OpenCode only, no provider variants)
 agent-build/manifest.json ← per-platform frontmatter (model, tools, permissions, ...)
 agent-build/build.mjs    ← combines them and writes .claude/** and .opencode/**
 ```
@@ -77,6 +78,26 @@ multiple objects to the `opencode` array.
 ### Add a brand-new command
 Identical to adding an agent, but use `Commands/` and the `commands` key
 in the manifest.
+
+### Add a brand-new skill
+Skills are OpenCode-only. They have no provider variants (no GH/GLM split).
+
+1. Create `Skills/<new-name>/SKILL.md` with the body (no frontmatter needed).
+2. Add an entry to `agent-build/manifest.json` under `skills`:
+   ```json
+   "<new-name>": {
+     "opencode": {
+       "frontmatter": {
+         "name": "<new-name>",
+         "description": "..."
+       }
+     }
+   }
+   ```
+3. Run `npm run build:agents`.
+
+The build generates `.opencode/skills/<new-name>/SKILL.md`. Skill frontmatter
+supports only `name` and `description`.
 
 ## Scripts
 

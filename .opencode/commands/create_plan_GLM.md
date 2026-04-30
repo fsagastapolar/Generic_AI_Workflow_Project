@@ -14,9 +14,16 @@ model: zai-coding-plan/glm-5.1
 
 You are tasked with creating detailed implementation plans through an interactive, iterative process. You should be skeptical, thorough, and work collaboratively with the user to produce high-quality technical specifications.
 
+## Config Read (At Startup)
+
+1. Read `project.config.json` from the repository root
+2. Set `LINEAR_ENABLED = config.linear?.enabled === true`
+3. Set `GUIDELINES_PATH = config.project?.guidelinesPath || '.claude/project_guidelines.md'`
+4. If the config file does not exist, proceed with defaults: `LINEAR_ENABLED = false`, `GUIDELINES_PATH = '.claude/project_guidelines.md'`
+
 ## Project Guidelines (MANDATORY)
 
-Before creating any implementation plan, read and understand the project guidelines at `.claude/project_guidelines.md`. These guidelines are CRITICAL and must be incorporated into your plan.
+Before creating any implementation plan, read and understand the project guidelines at the path from `GUIDELINES_PATH` (read from config). These guidelines are CRITICAL and must be incorporated into your plan.
 
 ## Code Quality
 - Prefer correct, complete implementations over minimal ones.
@@ -24,7 +31,9 @@ Before creating any implementation plan, read and understand the project guideli
 - When fixing a bug, fix the root cause, not the symptom.
 - If something I asked for requires error handling or validation to work reliably, include it without asking.
 
-## Linear Integration (Auto-Detection)
+## Linear Integration (Conditional — gated by config)
+
+If `LINEAR_ENABLED` is true:
 
 Whenever you receive input (parameters or user messages), **automatically scan for Linear references**:
 
@@ -39,13 +48,15 @@ If any Linear references are detected:
 
 If no Linear references are detected, proceed normally. You can also ask the user if there's an associated Linear ticket.
 
+If `LINEAR_ENABLED` is false: skip all Linear detection and ticket fetching entirely. Do not mention Linear in prompts or questions.
+
 ## Initial Response
 
 When this command is invoked:
 
 1. **Check if parameters were provided**:
    - If a file path or ticket reference was provided as a parameter, skip the default message
-   - If a Linear identifier (e.g. `TEAM-123`) or URL is detected, immediately fetch the ticket via `linear-searcher` agent
+   - If `LINEAR_ENABLED` and a Linear identifier (e.g. `TEAM-123`) or URL is detected, immediately fetch the ticket via `linear-searcher` agent
    - Immediately read any provided files FULLY
    - Begin the research process
 
@@ -55,55 +66,21 @@ I'll help you create a detailed implementation plan. Let me start by understandi
 
 Please provide:
 1. The task/ticket description (or reference to a ticket file)
-2. A Linear ticket reference (e.g. TEAM-123) or URL — I'll auto-fetch the details
-3. Any relevant context, constraints, or specific requirements
-4. Links to related research or previous implementations
+2. Any relevant context, constraints, or specific requirements
+3. Links to related research or previous implementations
 
 I'll analyze this information and work with you to create a comprehensive plan.
+```
 
-Tip: You can also invoke this command with a Linear ticket directly: `/create_plan TEAM-123`
-Or with a ticket file: `/create_plan thoughts/allison/tickets/eng_1234.md`
+If `LINEAR_ENABLED` is true, also include in the default message:
+```
+You can also invoke this command with a Linear ticket directly: `/create_plan TEAM-123`
 For deeper analysis, try: `/create_plan think deeply about TEAM-123`
 ```
 
+If `LINEAR_ENABLED` is false, omit all Linear-related mentions from the default message.
+
 Then wait for the user's input.
-
-## Agent Dispatch Protocol (Cost Optimization)
-
-When spawning any of the following agents, you MUST use the fallback strategy below to minimize costs. Try the cheaper OpenCode agent first; only fall back to the expensive Claude agent if OpenCode fails.
-
-**Agents with OpenCode counterparts:**
-- `codebase-locator`
-- `codebase-analyzer`
-- `codebase-pattern-finder`
-- `thoughts-locator`
-- `thoughts-analyzer`
-- `research-gatherer`
-- `plan-writer`
-- `linear-searcher`
-
-### How to dispatch a research agent:
-
-1. **Try OpenCode first** — Run the agent via Bash with a 120-second timeout:
-   ```bash
-   TMPFILE=$(mktemp /tmp/opencode_dispatch_XXXXXX.json)
-   timeout 120 opencode run --agent "<agent-name>" --format json "<prompt>" > "$TMPFILE" 2>&1
-   EXIT_CODE=$?
-   RESULT=$(grep '"type":"text"' "$TMPFILE" | jq -r '.part.text // empty' 2>/dev/null)
-   RESULT_LEN=${#RESULT}
-   HAS_ERROR=$(grep -ciE "(token limit|rate limit|context length exceeded|quota exceeded|ECONNREFUSED)" "$TMPFILE" || true)
-   rm -f "$TMPFILE"
-   if [ $EXIT_CODE -ne 0 ] || [ $RESULT_LEN -lt 50 ] || [ "$HAS_ERROR" -gt 0 ]; then
-     echo "OPENCODE_FALLBACK_NEEDED"
-   else
-     echo "$RESULT"
-   fi
-   ```
-   If the output is `OPENCODE_FALLBACK_NEEDED`, spawn the equivalent Claude agent instead.
-
-2. **Run OpenCode agents sequentially** (not in parallel) to avoid overwhelming the cheaper provider
-3. **Run Claude fallback agents in parallel** as usual
-4. If ALL OpenCode calls fail on the first attempt, skip OpenCode for subsequent calls and use Claude agents directly
 
 ---
 
@@ -116,11 +93,11 @@ When spawning any of the following agents, you MUST use the fallback strategy be
    - **IMPORTANT**: Use the Read tool WITHOUT limit/offset parameters
    - **CRITICAL**: DO NOT spawn sub-tasks before reading these files yourself
 
-2. **Detect Linear references** and fetch ticket data if found
+2. **Detect Linear references** and fetch ticket data if found (only if `LINEAR_ENABLED`)
 
 ### Step 2: Research — Invoke `research-gatherer` Agent
 
-Spawn the `research-gatherer` agent (via dispatch protocol) with:
+Spawn the `research-gatherer` agent via Task tool with:
 - Task description
 - Ticket contents (if any)
 - User context
@@ -191,13 +168,13 @@ Wait for the user's choice before proceeding.
 
 ### Step 5: Write the Plan — Invoke `plan-writer` Agent
 
-Spawn the `plan-writer` agent (via dispatch protocol) with:
+Spawn the `plan-writer` agent via Task tool with:
 - Research brief from Step 2
 - User decisions from Step 3
 - Scope (IN/OUT)
 - Phasing from Step 4
 - Project guidelines summary
-- **Linear data** (if detected): Issue details, UUID, identifier, title, acceptance criteria
+- **Linear data** (if `LINEAR_ENABLED` and detected): Issue details, UUID, identifier, title, acceptance criteria
 - **Plan metadata requirement**: Include a plan header with metadata so review tooling can update it later.
   - Required section (placed right after the title, before `## Overview`):
     ```

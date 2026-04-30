@@ -213,9 +213,32 @@ function buildSection(claudeDir, opencodeDir, canonicalDir) {
   return out;
 }
 
+function buildSkillsSection(opencodeDir, canonicalDir) {
+  const out = {};
+  const absOpenCode = path.join(ROOT, opencodeDir);
+  if (!fs.existsSync(absOpenCode)) return out;
+
+  for (const entry of fs.readdirSync(absOpenCode)) {
+    const entryAbs = path.join(absOpenCode, entry);
+    if (!fs.statSync(entryAbs).isDirectory()) continue;
+    const skillFile = path.join(entryAbs, 'SKILL.md');
+    if (!fs.existsSync(skillFile)) continue;
+    const text = fs.readFileSync(skillFile, 'utf8');
+    const { frontmatter } = parseFrontmatter(text);
+    out[entry] = {
+      opencode: {
+        frontmatter,
+      },
+    };
+  }
+
+  return out;
+}
+
 const manifest = {
   agents: buildSection('.claude/agents', '.opencode/agents', 'Agents'),
   commands: buildSection('.claude/commands', '.opencode/commands', 'Commands'),
+  skills: buildSkillsSection('.opencode/skills', 'Skills'),
 };
 
 const outPath = path.join(__dirname, 'manifest.json');
@@ -223,3 +246,4 @@ fs.writeFileSync(outPath, JSON.stringify(manifest, null, 2) + '\n');
 console.log(`Wrote ${outPath}`);
 console.log(`  agents:   ${Object.keys(manifest.agents).length} canonical entries`);
 console.log(`  commands: ${Object.keys(manifest.commands).length} canonical entries`);
+console.log(`  skills:   ${Object.keys(manifest.skills).length} canonical entries`);

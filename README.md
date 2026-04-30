@@ -1,12 +1,12 @@
 # Generic AI Workflow Project
 
-This repository is a reusable template for organizing AI agents and slash commands in a way that can be adapted to many projects.
+This repository is a reusable template for organizing AI agents, slash commands, and skills in a way that can be adapted to many projects.
 
-The goal is to keep agent and command logic generic, portable, and maintainable.
+The goal is to keep agent, command, and skill logic generic, portable, and maintainable.
 
 ## What this project is for
 
-- Store a generic agent/command system that can be reused in different codebases.
+- Store a generic agent/command/skill system that can be reused in different codebases.
 - Avoid project-specific assumptions in prompts (framework names, app-specific paths, one-off business context).
 - Keep prompt bodies and platform frontmatter separate so updates are consistent and scalable.
 
@@ -25,6 +25,7 @@ The goal is to keep agent and command logic generic, portable, and maintainable.
 
 - `Agents/` - canonical agent bodies.
 - `Commands/` - canonical command bodies.
+- `Skills/` - canonical skill bodies (OpenCode only, directory-per-skill).
 - `agent-build/manifest.json` - frontmatter source of truth.
 - `agent-build/build.mjs` - generator that writes platform files.
 - `.claude/` and `.opencode/` - generated outputs (do not hand-edit).
@@ -32,7 +33,7 @@ The goal is to keep agent and command logic generic, portable, and maintainable.
 
 ## How generation works
 
-1. Edit canonical bodies in `Agents/` or `Commands/`.
+1. Edit canonical bodies in `Agents/`, `Commands/`, or `Skills/`.
 2. Edit platform frontmatter in `agent-build/manifest.json` when needed.
 3. Run build script to regenerate `.claude/` and `.opencode/` files.
 
@@ -52,7 +53,7 @@ Run from repository root:
 
 ## Recommended workflow
 
-- Make changes only in canonical sources (`Agents/`, `Commands/`, `agent-build/manifest.json`).
+- Make changes only in canonical sources (`Agents/`, `Commands/`, `Skills/`, `agent-build/manifest.json`).
 - Regenerate with `npm run build:agents`.
 - Validate with `npm run build:agents:check` before commit/PR.
 - Commit both canonical changes and regenerated outputs.

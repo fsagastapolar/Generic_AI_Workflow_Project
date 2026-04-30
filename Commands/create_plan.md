@@ -102,7 +102,7 @@ The agent will:
 
 **After the agent returns**, read the most critical files it identified into your own context so you can ask informed questions.
 
-### Step 3: Interactive Q&A — One Question at a Time
+### Step 3: Interactive Q&A
 
 Present your findings summary:
 ```
@@ -113,8 +113,28 @@ I've found that:
 - [Relevant pattern or constraint discovered]
 - [Potential complexity or edge case identified]
 
-I have [N] technical questions and [M] business logic questions. Let's go through them one at a time.
+I have [N] technical questions and [M] business logic questions.
 ```
+
+#### Step 3a: Choose Questioning Mode
+
+Before diving into questions, ask the user which questioning mode they prefer:
+
+```
+**How would you like to proceed with the Q&A phase?**
+
+1. **Standard Q&A** — Structured one-at-a-time questions with 4+ options per question and recommendations. Reliable and predictable.
+
+2. **Grill-Me Mode** — Relentless, adversarial interviewing that walks every branch of the design tree, resolving dependencies one-by-one. Deeper but takes longer. The agent will challenge your assumptions, probe for edge cases you haven't considered, and push for specificity on vague requirements.
+
+3. Other — describe your preferred approach
+
+> **My recommendation: Option 2 (Grill-Me Mode)** — The adversarial style catches more issues early and produces higher-quality plans. The extra time invested here saves rework later.
+```
+
+Wait for the user's choice, then proceed with the appropriate mode below.
+
+#### Step 3b: Standard Q&A (if user chose Option 1)
 
 Ask each question individually, waiting for the user's answer before presenting the next. **Technical questions first, then Business Logic.**
 
@@ -136,6 +156,22 @@ Rules:
 - At least 4 options per question
 - Always include a recommendation with reasoning
 - Only ask questions you genuinely cannot answer through code investigation
+
+#### Step 3c: Grill-Me Mode (if user chose Option 2)
+
+Activate the **grill-me** questioning style. In this mode you replace the standard structured Q&A with a relentless, adversarial interview:
+
+**Grill-Me Rules:**
+- Interview the user relentlessly about every aspect of the plan until you reach shared understanding
+- Walk down each branch of the design tree, resolving dependencies between decisions one-by-one
+- For each question, provide your recommended answer
+- Ask the questions one at a time
+- If a question can be answered by exploring the codebase, explore the codebase instead of asking
+- Challenge vague answers — don't accept "we'll figure it out later" or "it depends"
+- Probe for edge cases, failure modes, and implicit assumptions
+- Keep drilling until every design decision is resolved with a concrete, implementable answer
+- Still cover both technical and business logic questions
+- When you encounter a branch point (a decision that changes downstream questions), resolve it before moving forward
 
 ### Step 4: Structure Approval
 
@@ -204,7 +240,8 @@ Iterate based on feedback until the user is satisfied.
 ## Principles
 
 1. **Be Skeptical**: Question vague requirements, identify issues early, don't assume — verify with code
-2. **Be Interactive**: Get buy-in at each step, ONE question at a time, at least 4 options, always recommend
+2. **Be Interactive**: Get buy-in at each step. ONE question at a time. At least 4 options (standard mode). Always recommend. In grill-me mode, be relentless and resolve every branch.
 3. **Be Thorough**: Read files completely, research with agents, include file:line references, separate automated vs manual criteria
 4. **No Open Questions in Final Plan**: If you encounter unresolved questions, STOP and ask. Never write a plan with gaps.
 5. **Delegate the Work**: Research goes to `research-gatherer`, plan writing goes to `plan-writer`. You own the conversation.
+6. **Choose the Right Depth**: Offer grill-me mode when quality matters more than speed. The deeper the questioning, the better the plan.

@@ -8,6 +8,5 @@
     "build:agents:gh": "node agent-build/build.mjs --opencode=gh",
     "build:agents:glm": "node agent-build/build.mjs --opencode=glm",
     "agents:extract": "node agent-build/extract-manifest.mjs"
-  },
   }
 }

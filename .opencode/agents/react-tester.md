@@ -89,7 +89,7 @@ React updates the DOM asynchronously via the Virtual DOM and reconciliation cycl
 
 ```javascript
 // Wait for React's async updates to settle (via agent-browser)
-await agentBrowser.waitForTimeout(500)
+agent-browser wait 500
 ```
 
 **When to use**:
@@ -105,7 +105,7 @@ await agentBrowser.waitForTimeout(500)
 React applications often use dynamic class names (CSS Modules, Tailwind, styled-components). You must NEVER rely on generated class names for selection. Instead, prioritize the **accessibility tree** for resilient, semantic-based testing.
 
 **Selection Priority (Highest to Lowest)**:
-1. **getByRole (Accessibility Tree)**: Use semantic roles and accessible names — e.g., find a button by role "button" and name "Submit". This is the most resilient approach and also validates that the app is accessible.
+1. **Role-first selection (Accessibility Tree)**: Use semantic roles and accessible names with `agent-browser find role ...` — e.g., `agent-browser find role button click --name "Submit"`. This is the most resilient approach and also validates accessibility contracts.
 2. **data-testid**: Check for `data-testid` attributes. This is the explicit testing contract.
 3. **Accessible Labels**: Use `aria-label`, `aria-labelledby`, or associated `<label>` elements.
 4. **Semantic Text**: Visible text content (e.g., "Submit", "Login").
@@ -121,7 +121,7 @@ React applications often use dynamic class names (CSS Modules, Tailwind, styled-
 
 React Portals render children into a DOM node outside the parent hierarchy (e.g., modals, tooltips, dropdowns). When testing these:
 
-- Use `getByRole` to find the portal content by its semantic role (e.g., role "dialog" for modals)
+- Use semantic role lookups for portal content (e.g., `agent-browser find role dialog click --name "Close"`)
 - Do NOT assume portal content is within the main `#root` element
 - Use `agent-browser snapshot` to verify the full page accessibility tree when portal elements seem missing
 
@@ -133,32 +133,37 @@ React apps commonly show loading indicators, skeleton screens, or suspense fallb
 
 ```javascript
 // Wait for loading to complete — look for actual content, not the skeleton (via agent-browser)
-await agentBrowser.waitForSelector('[data-testid="user-list"]')
+agent-browser wait '[data-testid="user-list"]'
 // Or wait for the loading indicator to disappear
-await agentBrowser.waitForSelector('[data-testid="loading-spinner"]', { state: 'hidden' })
+agent-browser wait --fn "!document.querySelector('[data-testid=\"loading-spinner\"]')"
 ```
 
 ### 5. State Management Verification
 
 When test specifications require store state verification:
 
-**Redux (via agent-browser evaluate)**:
-```javascript
-const storeState = await agentBrowser.evaluate(() => {
-  // If the app exposes the store on window (dev mode)
-  if (window.__REDUX_STORE__) return window.__REDUX_STORE__.getState()
-  // Or via Redux DevTools
-  if (window.__REDUX_DEVTOOLS_EXTENSION__) return window.__REDUX_DEVTOOLS_EXTENSION__.getState()
-  return null
-})
+**Redux (via `agent-browser eval --stdin`)**:
+```bash
+cat <<'EOF' | agent-browser eval --stdin
+if (window.__REDUX_STORE__) {
+  JSON.stringify(window.__REDUX_STORE__.getState())
+} else if (window.__REDUX_DEVTOOLS_EXTENSION__?.getState) {
+  JSON.stringify(window.__REDUX_DEVTOOLS_EXTENSION__.getState())
+} else {
+  null
+}
+EOF
 ```
 
 **Zustand (if exposed on window)**:
-```javascript
-const storeState = await agentBrowser.evaluate(() => {
-  if (window.__ZUSTAND_STORE__) return window.__ZUSTAND_STORE__.getState()
-  return null
-})
+```bash
+cat <<'EOF' | agent-browser eval --stdin
+if (window.__ZUSTAND_STORE__) {
+  JSON.stringify(window.__ZUSTAND_STORE__.getState())
+} else {
+  null
+}
+EOF
 ```
 
 **Usage**: Only verify store state when explicitly requested in test specifications. Prefer verifying behavior through the UI (what the user sees) over internal state checks.
@@ -170,7 +175,7 @@ When testing route transitions:
 **Check URL changes**:
 ```javascript
 // Wait for navigation to complete (via agent-browser)
-await agentBrowser.waitForURL('**/dashboard')
+agent-browser wait --url "**/dashboard"
 ```
 
 **Verify route protection**:
@@ -185,12 +190,7 @@ When test specifications indicate API mocking:
 
 ```javascript
 // Mock API response (via agent-browser)
-await agentBrowser.route('**/api/users', route => {
-  route.fulfill({
-    status: 200,
-    body: JSON.stringify({ users: [] })
-  })
-})
+agent-browser network route "**/api/users" --body '{"users":[]}'
 ```
 
 **Usage**: Only mock when test spec explicitly requests it.
@@ -202,16 +202,16 @@ await agentBrowser.route('**/api/users', route => {
 1. **Ensure Fresh Content (CRITICAL)**:
     - Before any testing, **always bust the browser cache** by running:
       ```bash
-      agent-browser evaluate "caches.keys().then(names => names.forEach(name => caches.delete(name)))"
+      agent-browser eval "caches.keys().then(names => Promise.all(names.map(name => caches.delete(name))))"
       ```
     - On every navigation, append a cache-busting query parameter:
       Use `http://localhost:3000/login?_cb=<timestamp>` (e.g., `?_cb=1709330400`) to force fresh content.
-      You can get a timestamp via: `agent-browser evaluate "Date.now()"`
+      You can get a timestamp via: `agent-browser eval "Date.now()"`
     - After navigating, **hard reload** using:
       ```bash
-      agent-browser evaluate "location.reload(true)"
+      agent-browser reload
       ```
-     Then wait 1-2 seconds for the page to fully re-render and hydrate.
+     Then wait for the app to fully re-render and hydrate via `agent-browser wait --load networkidle`.
    - **Never trust cached page content** — if something looks outdated, reload before reporting a failure.
 
 2. **Verify Frontend is Running**:
@@ -349,7 +349,7 @@ When a test step fails:
 1. **Capture Context**:
     - Take screenshot: `agent-browser screenshot`
     - Read console: `agent-browser console`
-    - Get current URL: `agent-browser evaluate "window.location.href"`
+    - Get current URL: `agent-browser get url`
     - Get accessibility snapshot: `agent-browser snapshot`
 
 2. **Attempt Recovery** (if reasonable):
@@ -384,7 +384,7 @@ Your reports should be actionable for the implement_plan agent to fix issues.
 ## Best Practices
 
 1. **Always wait for reconciliation** after React state changes (500ms default)
-2. **Use accessibility tree first** — getByRole is the most resilient selector strategy
+2. **Use accessibility tree first** — role-based selection (`agent-browser find role ...`) is the most resilient strategy
 3. **Use data-testid** as a reliable fallback when semantic selectors are ambiguous
 4. **Verify store state** only when explicitly requested
 5. **Test only what's specified** - no scope creep
@@ -392,7 +392,7 @@ Your reports should be actionable for the implement_plan agent to fix issues.
 7. **Capture failure context** - screenshots, console, URL, accessibility snapshot
 8. **Use configurable URLs** - never hardcode localhost:3000
 9. **Check console errors** - React warnings/errors are important signals
-10. **Wait for navigation** - use `waitForURL` for route changes
+10. **Wait for navigation** - use `agent-browser wait --url` for route changes
 11. **Wait for hydration** - SSR pages need to be interactive before clicking
 12. **Be deterministic** - same test should produce same result
 

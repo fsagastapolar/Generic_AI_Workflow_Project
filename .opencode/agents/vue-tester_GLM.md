@@ -90,7 +90,7 @@ Vue.js applications update the DOM asynchronously via the reactivity system. Aft
 
 ```javascript
 // Wait for Vue's reactive updates to settle
-await page.waitForTimeout(300)
+agent-browser wait 300
 ```
 
 **When to use**:
@@ -104,8 +104,8 @@ await page.waitForTimeout(300)
 Vue generates dynamic attributes during development (e.g., `data-v-7ba5bd90`). You must NEVER use these for selection.
 
 **Selection Priority (Highest to Lowest)**:
-1. **data-testid**: Always check for `data-testid` attributes first. This is the contract.
-2. **Accessibility Roles**: Use implicit roles (e.g., `<button>` is role "button").
+1. **Accessibility Roles**: Use semantic roles and accessible names with `agent-browser find role ...` first.
+2. **data-testid**: Use `data-testid` as explicit testing contracts (`agent-browser find testid ...`).
 3. **Semantic Text**: Visible labels (e.g., "Submit", "Login").
 4. **Stable CSS Classes**: Component-level classes that look manually named (e.g., `.login-form`, `.header-nav`).
 
@@ -120,7 +120,7 @@ Vue generates dynamic attributes during development (e.g., `data-v-7ba5bd90`). Y
 - Navigate to actual URLs (e.g., `http://localhost:3000/login`) via `agent-browser`
 - Test complete user journeys (login → dashboard → logout)
 - Verify routing, authentication, API integration
-- Use `agent-browser navigate` to load pages
+- Use `agent-browser open` to load pages
 
 **Component Testing** (Isolated Component Behavior):
 - Test individual Vue components in isolation
@@ -132,17 +132,16 @@ Vue generates dynamic attributes during development (e.g., `data-v-7ba5bd90`). Y
 
 When test specifications require store state verification:
 
-**Via Browser Evaluation** (use `agent-browser evaluate`):
-```javascript
-// Check Pinia store state
-const storeState = await agentBrowser.evaluate(() => {
-  const pinia = window.__PINIA__
-  if (!pinia) return null
-
-  // Access specific store (e.g., authStore)
-  const authStore = pinia.state.value.auth
-  return authStore
-})
+**Via Browser Evaluation** (use `agent-browser eval --stdin`):
+```bash
+cat <<'EOF' | agent-browser eval --stdin
+const pinia = window.__PINIA__
+if (!pinia) {
+  null
+} else {
+  JSON.stringify(pinia.state?.value?.auth ?? null)
+}
+EOF
 ```
 
 **Usage**: Only verify store state when explicitly requested in test specifications.
@@ -154,7 +153,7 @@ When testing route transitions:
 **Check URL changes**:
 ```javascript
 // Wait for navigation to complete
-await agentBrowser.waitForURL('**/dashboard')
+agent-browser wait --url "**/dashboard"
 ```
 
 **Verify navigation guards**:
@@ -168,12 +167,7 @@ When test specifications indicate API mocking:
 
 ```javascript
 // Mock API response (via agent-browser)
-await agentBrowser.route('**/api/users', route => {
-  route.fulfill({
-    status: 200,
-    body: JSON.stringify({ users: [] })
-  })
-})
+agent-browser network route "**/api/users" --body '{"users":[]}'
 ```
 
 **Usage**: Only mock when test spec explicitly requests it.
@@ -185,16 +179,16 @@ await agentBrowser.route('**/api/users', route => {
 1. **Ensure Fresh Content (CRITICAL)**:
    - Before any testing, **always bust the browser cache** by running:
       ```bash
-      agent-browser evaluate "caches.keys().then(names => names.forEach(name => caches.delete(name)))"
+      agent-browser eval "caches.keys().then(names => Promise.all(names.map(name => caches.delete(name))))"
       ```
     - On every navigation, append a cache-busting query parameter:
       Use `http://localhost:3000/login?_cb=<timestamp>` (e.g., `?_cb=1709330400`) to force fresh content.
-      You can get a timestamp via: `agent-browser evaluate "Date.now()"`
+      You can get a timestamp via: `agent-browser eval "Date.now()"`
     - After navigating, **hard reload** using:
       ```bash
-      agent-browser evaluate "location.reload(true)"
+      agent-browser reload
       ```
-     Then wait 1-2 seconds for the page to fully re-render.
+     Then wait for the app to fully re-render via `agent-browser wait --load networkidle`.
    - **Never trust cached page content** — if something looks outdated, reload before reporting a failure.
 
 2. **Verify Frontend is Running**:
@@ -203,8 +197,8 @@ await agentBrowser.route('**/api/users', route => {
    - Verify the application loads successfully
 
 3. **Understand Current State**:
-    - Use `agent-browser snapshot` to see the page structure
-    - Check console messages via `agent-browser evaluate` for initial warnings/errors
+    - Use `agent-browser snapshot` to see the page's accessibility tree structure
+    - Check console messages via `agent-browser console` for initial warnings/errors
    - Read any configuration from the test specification
 
 ### Phase 2: Plan (Strategy)
@@ -333,7 +327,7 @@ When a test step fails:
 1. **Capture Context**:
     - Take screenshot: `agent-browser screenshot`
     - Read console: `agent-browser console`
-    - Get current URL: `agent-browser evaluate "window.location.href"`
+    - Get current URL: `agent-browser get url`
 
 2. **Attempt Recovery** (if reasonable):
    - Scroll element into view if not visible
@@ -373,7 +367,7 @@ Your reports should be actionable for the implement_plan agent to fix issues.
 6. ✅ **Capture failure context** - screenshots, console, URL
 7. ✅ **Use configurable URLs** - never hardcode localhost:3000
 8. ✅ **Check console errors** - Vue warnings/errors are important
-9. ✅ **Wait for navigation** - use `waitForURL` for route changes
+9. ✅ **Wait for navigation** - use `agent-browser wait --url` for route changes
 10. ✅ **Be deterministic** - same test should produce same result
 
 ## Anti-Patterns to Avoid

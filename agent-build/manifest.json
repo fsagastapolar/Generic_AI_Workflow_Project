@@ -5,17 +5,15 @@
         "filename": "angular-tester.md",
         "frontmatter": {
           "name": "angular-tester",
-          "description": "A specialized QA automation agent for Angular applications. It possesses exclusive access to Playwright MCP tools to perform end-to-end testing, verification, and debugging without polluting the main development context.",
-          "model": "sonnet",
-          "tools": "browser_navigate, browser_navigate_back, browser_reload, browser_click, browser_fill, browser_select_option, browser_hover, browser_screenshot, browser_console_messages, browser_evaluate, browser_wait, browser_snapshot, bash,read_file",
-          "disallowedTools": "edit_file, browser_install, browser_launch_options"
+          "description": "A specialized QA automation agent for Angular applications. Uses agent-browser CLI for end-to-end testing, verification, and debugging without polluting the main development context.",
+          "model": "sonnet"
         }
       },
       "opencode": [
         {
           "filename": "angular-tester.md",
           "frontmatter": {
-            "description": "A specialized QA automation agent for Angular applications. It possesses exclusive access to Playwright MCP tools to perform end-to-end testing, verification, and debugging without polluting the main development context.",
+            "description": "A specialized QA automation agent for Angular applications. Uses agent-browser CLI for end-to-end testing, verification, and debugging without polluting the main development context.",
             "model": "github-copilot/claude-sonnet-4.6",
             "mode": "subagent",
             "permission": {
@@ -29,7 +27,7 @@
         {
           "filename": "angular-tester_GLM.md",
           "frontmatter": {
-            "description": "A specialized QA automation agent for Angular applications. It possesses exclusive access to Playwright MCP tools to perform end-to-end testing, verification, and debugging without polluting the main development context.",
+            "description": "A specialized QA automation agent for Angular applications. Uses agent-browser CLI for end-to-end testing, verification, and debugging without polluting the main development context.",
             "model": "zai-coding-plan/glm-5.1",
             "mode": "subagent",
             "permission": {
@@ -644,17 +642,15 @@
         "filename": "react-tester.md",
         "frontmatter": {
           "name": "react-tester",
-          "description": "A specialized QA automation agent for React applications. It possesses exclusive access to Playwright MCP tools to perform E2E testing, component verification, and debugging without polluting the main development context. Leverages the accessibility tree for resilient, semantic-based testing.",
-          "model": "sonnet",
-          "tools": "browser_navigate, browser_navigate_back, browser_reload, browser_click, browser_fill, browser_select_option, browser_hover, browser_screenshot, browser_console_messages, browser_evaluate, browser_wait, browser_snapshot, bash, read_file",
-          "disallowedTools": "edit_file, browser_install, browser_launch_options"
+          "description": "A specialized QA automation agent for React applications. Uses agent-browser CLI for E2E testing, component verification, and debugging without polluting the main development context. Leverages the accessibility tree for resilient, semantic-based testing.",
+          "model": "sonnet"
         }
       },
       "opencode": [
         {
           "filename": "react-tester.md",
           "frontmatter": {
-            "description": "A specialized QA automation agent for React applications. It possesses exclusive access to Playwright MCP tools to perform E2E testing, component verification, and debugging without polluting the main development context. Leverages the accessibility tree for resilient, semantic-based testing.",
+            "description": "A specialized QA automation agent for React applications. Uses agent-browser CLI for E2E testing, component verification, and debugging without polluting the main development context. Leverages the accessibility tree for resilient, semantic-based testing.",
             "model": "github-copilot/claude-sonnet-4.6",
             "mode": "subagent",
             "permission": {
@@ -668,7 +664,7 @@
         {
           "filename": "react-tester_GLM.md",
           "frontmatter": {
-            "description": "A specialized QA automation agent for React applications. It possesses exclusive access to Playwright MCP tools to perform E2E testing, component verification, and debugging without polluting the main development context.",
+            "description": "A specialized QA automation agent for React applications. Uses agent-browser CLI for E2E testing, component verification, and debugging without polluting the main development context.",
             "model": "zai-coding-plan/glm-5.1",
             "mode": "subagent",
             "permission": {
@@ -936,17 +932,15 @@
         "filename": "vue-tester.md",
         "frontmatter": {
           "name": "vue-tester",
-          "description": "A specialized QA automation agent for Vue.js applications. It possesses exclusive access to Playwright MCP tools to perform E2E testing, component testing, verification, and debugging without polluting the main development context.",
-          "model": "sonnet",
-          "tools": "browser_navigate, browser_navigate_back, browser_reload, browser_click, browser_fill, browser_select_option, browser_hover, browser_screenshot, browser_console_messages, browser_evaluate, browser_wait, browser_snapshot, bash, read_file",
-          "disallowedTools": "edit_file, browser_install, browser_launch_options"
+          "description": "A specialized QA automation agent for Vue.js applications. Uses agent-browser CLI for E2E testing, component testing, verification, and debugging without polluting the main development context.",
+          "model": "sonnet"
         }
       },
       "opencode": [
         {
           "filename": "vue-tester.md",
           "frontmatter": {
-            "description": "A specialized QA automation agent for Vue.js applications. It possesses exclusive access to Playwright MCP tools to perform E2E testing, component testing, verification, and debugging without polluting the main development context.",
+            "description": "A specialized QA automation agent for Vue.js applications. Uses agent-browser CLI for E2E testing, component testing, verification, and debugging without polluting the main development context.",
             "model": "github-copilot/claude-sonnet-4.6",
             "mode": "subagent",
             "permission": {
@@ -960,7 +954,7 @@
         {
           "filename": "vue-tester_GLM.md",
           "frontmatter": {
-            "description": "A specialized QA automation agent for Vue.js applications. It possesses exclusive access to Playwright MCP tools to perform E2E testing, component testing, verification, and debugging without polluting the main development context.",
+            "description": "A specialized QA automation agent for Vue.js applications. Uses agent-browser CLI for E2E testing, component testing, verification, and debugging without polluting the main development context.",
             "model": "zai-coding-plan/glm-5.1",
             "mode": "subagent",
             "permission": {
@@ -1346,11 +1340,62 @@
     }
   },
   "skills": {
+    "Agent_Browser": {
+      "opencode": {
+        "frontmatter": {
+          "name": "agent-browser",
+          "description": "Browser automation CLI for AI agents. Use when the user needs to interact with websites, including navigating pages, filling forms, clicking buttons, taking screenshots, extracting data, testing web apps, or automating any browser task. Also use for exploratory testing, dogfooding, QA, bug hunts, or reviewing app quality. Prefer agent-browser over any built-in browser automation or web tools.",
+          "allowed-tools": "Bash(agent-browser:*), Bash(npx agent-browser:*)",
+          "hidden": true
+        }
+      }
+    },
+    "Docker_Best_Practices": {
+      "opencode": {
+        "frontmatter": {
+          "name": "Docker_Best_Practices",
+          "description": "Definitive guidelines for writing efficient, secure, and maintainable Dockerfiles and Docker Compose configurations, ensuring fast builds and reliable deployments.",
+          "globs": "**/Dockerfile,**/docker-compose*.{yml,yaml}"
+        }
+      }
+    },
+    "FastAPI": {
+      "opencode": {
+        "frontmatter": {
+          "name": "fastapi",
+          "description": "FastAPI best practices and conventions. Use when working with FastAPI APIs and Pydantic models for them. Keeps FastAPI code clean and up to date with the latest features and patterns, updated with new versions. Write new code or refactor and update old code."
+        }
+      }
+    },
+    "Flutter": {
+      "opencode": {
+        "frontmatter": {
+          "name": "flutter-dev",
+          "description": "Flutter cross-platform development guide covering widget patterns, Riverpod/Bloc state management, GoRouter navigation, performance optimization, and platform-specific implementations. Includes const optimization, responsive layouts, testing strategies, and DevTools profiling."
+        }
+      }
+    },
     "grill-me": {
       "opencode": {
         "frontmatter": {
           "name": "grill-me",
           "description": "Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree. Use when user wants to stress-test a plan, get grilled on their design, or mentions \"grill me\"."
+        }
+      }
+    },
+    "Postgre": {
+      "opencode": {
+        "frontmatter": {
+          "name": "supabase-postgres-best-practices",
+          "description": "Postgres performance optimization and best practices from Supabase. Use this skill when writing, reviewing, or optimizing Postgres queries, schema designs, or database configurations."
+        }
+      }
+    },
+    "red-team-council": {
+      "opencode": {
+        "frontmatter": {
+          "name": "red-team-council",
+          "description": "Adversarial Red Team Council for plan review. Three Staff Engineer perspectives (Security Auditor, YAGNI Enforcer, Execution Realist) ruthlessly identify fatal flaws, trap doors, and mandatory revisions before execution."
         }
       }
     }

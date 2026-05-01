@@ -89,19 +89,19 @@
       "hidden": true
     },
     "react-tester": {
-      "description": "QA automation agent for React applications using Playwright",
+      "description": "QA automation agent for React applications using agent-browser",
       "mode": "subagent",
       "model": "zai-coding-plan/glm-5.1",
       "hidden": true
     },
     "angular-tester": {
-      "description": "QA automation agent for Angular applications using Playwright",
+      "description": "QA automation agent for Angular applications using agent-browser",
       "mode": "subagent",
       "model": "zai-coding-plan/glm-5.1",
       "hidden": true
     },
     "vue-tester": {
-      "description": "QA automation agent for Vue.js applications using Playwright",
+      "description": "QA automation agent for Vue.js applications using agent-browser",
       "mode": "subagent",
       "model": "zai-coding-plan/glm-5.1",
       "hidden": true

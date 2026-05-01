@@ -23,7 +23,7 @@ All agents use `model: zai-coding-plan/glm-5.1` and `mode: subagent`.
 
 | # | Agent File | Description | Hidden | Permission Highlights |
 |---|-----------|-------------|--------|-----------------------|
-| 1 | `angular-tester.md` | QA automation for Angular apps via Playwright | Yes | edit: deny, write: deny |
+| 1 | `angular-tester.md` | QA automation for Angular apps via agent-browser | Yes | edit: deny, write: deny |
 | 2 | `codebase-analyzer.md` | Analyzes implementation details with file:line refs | No | edit: deny, write: deny, bash: deny |
 | 3 | `codebase-locator.md` | Locates files/directories by feature/topic | No | edit: deny, write: deny, bash: deny |
 | 4 | `codebase-pattern-finder.md` | Finds similar implementations and code patterns | No | edit: deny, write: deny, bash: deny |
@@ -32,13 +32,13 @@ All agents use `model: zai-coding-plan/glm-5.1` and `mode: subagent`.
 | 7 | `phase-executor.md` | Executes a single phase from an implementation plan | Yes | edit: allow, write: allow, bash: allow |
 | 8 | `plan-validator.md` | Audits implementation against its plan | No | edit: deny, write: deny, bash: allow |
 | 9 | `plan-writer.md` | Writes implementation plan documents from structured input | Yes | edit: allow, write: allow, bash: deny |
-| 10 | `react-tester.md` | QA automation for React apps via Playwright | Yes | edit: deny, write: deny, bash: allow |
+| 10 | `react-tester.md` | QA automation for React apps via agent-browser | Yes | edit: deny, write: deny, bash: allow |
 | 11 | `research-gatherer.md` | Orchestrates parallel research via sub-agents | No | edit: deny, write: deny, bash: deny |
 | 12 | `reviewer.md` | Backend analysis and comprehensive review | No | edit: deny, write: allow, bash: allow, webfetch: allow |
 | 13 | `testing-guide-orchestrator.md` | Decides which test guides to create and delegates | Yes | edit: allow, write: allow, bash: deny |
 | 14 | `thoughts-analyzer.md` | Extracts high-value insights from thoughts/ docs | No | edit: deny, write: deny, bash: deny |
 | 15 | `thoughts-locator.md` | Discovers docs in thoughts/ directory | No | edit: deny, write: deny, bash: deny |
-| 16 | `vue-tester.md` | QA automation for Vue.js apps via Playwright | Yes | edit: deny, write: deny, bash: allow |
+| 16 | `vue-tester.md` | QA automation for Vue.js apps via agent-browser | Yes | edit: deny, write: deny, bash: allow |
 | 17 | `web-search-researcher.md` | Web research for external/modern information | No | edit: deny, write: deny, webfetch: allow |
 
 ---
@@ -73,7 +73,7 @@ All agents use `model: zai-coding-plan/glm-5.1` and `mode: subagent`.
 | `tools: Read, Grep, Glob, LS` | `permission: { edit: deny, write: deny, bash: deny }` | OpenCode uses permission-based system instead of explicit tool allowlists |
 | `disallowedTools: edit_file` | `permission: { edit: deny }` | "deny" replaces disallowedTools |
 | `tools: Write, Edit` | `permission: { edit: allow, write: allow }` | "allow" enables write tools |
-| `tools: browser_*` | (unchanged - MCP-based) | Playwright tools work via MCP servers |
+| `tools: browser_*` | `agent-browser` CLI via Bash | Browser testing uses agent-browser CLI, not MCP |
 | `tools: WebSearch, WebFetch` | `permission: { webfetch: allow }` | Merged into webfetch permission |
 | `tools: Task` | Always available | Task tool for sub-agent invocation is always available |
 | `tools: TodoWrite` | `todowrite` tool | Always available |
@@ -132,11 +132,11 @@ These files from `.claude/` were intentionally not migrated as they are Claude-s
 |------|--------|
 | `.claude/mcp_config.json` | MCP config format differs; OpenCode uses its own MCP config |
 | `.claude/mcp_config_merged.json` | Claude-specific merged config |
-| `.claude/mcp_playwright.json` | Playwright MCP; needs separate OpenCode MCP setup |
+| `.claude/mcp_playwright.json` | Legacy Playwright MCP config (removed) |
 | `.claude/settings.json` | Claude-specific settings (theme, permissions) |
 | `.claude/settings.local.json` | Claude-specific local settings |
 
-**Note**: MCP server configurations (Playwright for browser testing, etc.) will need to be configured separately for OpenCode. See [OpenCode MCP docs](https://opencode.ai/docs/mcp-servers/).
+**Note**: Browser testing is handled via `agent-browser` CLI (invoked by tester agents through Bash). No MCP server configuration is needed for browser automation. See [OpenCode MCP docs](https://opencode.ai/docs/mcp-servers/) for other MCP servers.
 
 ---
 

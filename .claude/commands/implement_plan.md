@@ -129,7 +129,7 @@ If frontend changes were made and an E2E testing guide exists, ask the user:
 - **Run automated E2E tests** → invoke the appropriate tester agent via Task tool
 - **Skip, I'll test manually**
 
-**Never invoke Playwright tools directly** — always delegate to tester agents via Task tool.
+**Never invoke browser automation tools directly** — always delegate to tester agents via Task tool.
 
 ---
 

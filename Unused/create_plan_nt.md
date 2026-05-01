@@ -38,7 +38,7 @@ Before creating any implementation plan, read and understand the project guideli
   - Include setup prerequisites (target URLs, test data, mock credentials if applicable)
   - Specify expected outcomes and verification points for each test scenario
   - Follow the angular-tester's Research-Plan-Execute workflow structure (Navigate → Snapshot → Interact → Verify)
-  - **Note**: During implementation, the `angular-tester` agent will be invoked as a Task to execute these tests (keeping Playwright tools isolated from the main context)
+  - **Note**: During implementation, the `angular-tester` agent will be invoked as a Task to execute these tests (keeping browser automation isolated from the main context)
 
 **IMPORTANT**: If the plan contradicts these guidelines, STOP and revise it before presenting to the user.
 

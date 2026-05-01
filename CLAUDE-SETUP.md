@@ -4,9 +4,11 @@
 
 This project uses Claude AI with Model Context Protocol (MCP) configurations. To prevent security breaches and avoid accidentally exposing API keys or sensitive configurations to GitHub, we maintain example configuration files that need to be customized for your local environment.
 
+Browser automation for testing uses the **agent-browser** CLI (not Playwright). Tester agents (`react-tester`, `vue-tester`, `angular-tester`) invoke `agent-browser` commands directly via Bash — no MCP server is needed for browser testing.
+
 ## Security Notice
 
-⚠️ **Important**: Never commit files containing API keys, tokens, or other sensitive credentials to version control.
+**Important**: Never commit files containing API keys, tokens, or other sensitive credentials to version control.
 
 The following files are excluded from Git via `.gitignore`:
 - `.claude/mcp_config.json`
@@ -19,32 +21,26 @@ The following files are excluded from Git via `.gitignore`:
 
 ### 1. Install Dependencies
 
-First, install the project dependencies including MCP servers:
-
 ```bash
-# Install all dependencies (including MCP servers)
 npm install
 ```
 
-**Important**: MCP servers are installed **locally** (in `node_modules/`) rather than globally. This approach:
+MCP servers (if any) are installed **locally** (in `node_modules/`) rather than globally. This approach:
 - Avoids conflicts with other projects
 - Ensures version consistency across team members
 - Makes the setup reproducible and isolated
 - Prevents permission issues with global installations
 
-### 2. Install MCP Servers Locally
+### 2. Install agent-browser
 
-If you need to add additional MCP servers, always install them as project dependencies:
+Browser testing is done via the `agent-browser` CLI:
 
 ```bash
-# Install MCP servers as dev dependencies (local to project)
-npm install --save-dev @playwright/mcp
-# Add other MCP servers as needed
+npm install -g agent-browser
+agent-browser install
 ```
 
-**Never install MCP servers globally** (avoid `npm install -g`). This ensures all team members use the same versions and configurations.
-
-**Note**: Linear integration uses direct GraphQL API calls via `curl` (no MCP server needed). See `.env.example` for required `LINEAR_API_KEY`.
+See the `Agent_Browser` skill in `.opencode/skills/` for full usage details.
 
 ### 3. Claude Configuration Files
 
@@ -104,14 +100,7 @@ When configuring MCP servers, always reference the **local installation** in `no
 
 ```json
 {
-  "mcpServers": {
-    "playwright": {
-      "command": "node",
-      "args": [
-        "node_modules/@playwright/mcp/dist/index.js"
-      ]
-    }
-  }
+  "mcpServers": {}
 }
 ```
 
@@ -127,10 +116,9 @@ After setup, verify your configuration:
 1. Ensure all `.example` files have corresponding local versions without `.example` extension
 2. Check that your API keys and sensitive data are only in the local files
 3. Confirm these local files appear in `.gitignore`
-4. Verify MCP servers are installed locally:
+4. Verify agent-browser is installed:
    ```bash
-   # Check if MCP servers are in node_modules
-   ls node_modules/@playwright/mcp
+   agent-browser --version
    ```
 5. Test that Git doesn't track your configuration files:
    ```bash
@@ -138,22 +126,13 @@ After setup, verify your configuration:
    ```
    Your `.claude/*.json` (non-example) files should not appear as untracked
 
-### Testing MCP Server Configuration
+### Testing agent-browser
 
-To verify MCP servers are working correctly:
+To verify browser automation works:
 
-1. **Check server paths**: Ensure paths in your `mcp_config.json` point to existing files:
-   ```bash
-   # Verify server files exist
-   test -f node_modules/@playwright/mcp/dist/index.js && echo "Playwright MCP found" || echo "Playwright MCP NOT found"
-   ```
-
-2. **Test server execution**: Try running a server manually to check for errors:
-   ```bash
-   node node_modules/@playwright/mcp/dist/index.js --help
-   ```
-
-3. **Claude Integration**: Open Claude and verify the MCP servers appear in the available tools/context
+```bash
+agent-browser open https://example.com && agent-browser snapshot -i
+```
 
 ## Troubleshooting
 
@@ -178,18 +157,25 @@ cp mcp_config.json mcp_config.json.example
 # Edit the .example file to replace real keys with placeholders
 ```
 
+### agent-browser not found
+
+```bash
+npm install -g agent-browser
+agent-browser install
+```
+
 ### MCP Server not found
 
 If Claude can't find an MCP server:
 
 1. **Verify installation**:
    ```bash
-   npm list @playwright/mcp
+   npm list
    ```
 
 2. **Reinstall if missing**:
    ```bash
-   npm install --save-dev @playwright/mcp
+   npm install --save-dev <package-name>
    ```
 
 3. **Check path in config**: Ensure `mcp_config.json` uses the correct path:
@@ -202,10 +188,7 @@ If Claude can't find an MCP server:
 If an MCP server fails to start:
 
 1. **Check API keys**: Verify environment variables are set correctly in `mcp_config.json`
-2. **Test manually**: Run the server directly:
-   ```bash
-   node node_modules/@playwright/mcp/dist/index.js
-   ```
+2. **Test manually**: Run the server directly
 3. **Check permissions**: Ensure the server files are executable
 4. **Review logs**: Look for error messages in Claude's MCP server logs
 
@@ -215,10 +198,10 @@ If you previously installed MCP servers globally:
 
 ```bash
 # Uninstall global packages (optional but recommended)
-npm uninstall -g @playwright/mcp
+npm uninstall -g <package-name>
 
 # Ensure local installation
-npm install --save-dev @playwright/mcp
+npm install --save-dev <package-name>
 ```
 
 Update your `mcp_config.json` to use `node` with local paths instead of `npx` with global packages.

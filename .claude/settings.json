@@ -26,7 +26,7 @@
     ]
   },
   "enableAllProjectMcpServers": false,
-  "enabledMcpjsonServers": ["playwright", "semgrep"],
+  "enabledMcpjsonServers": ["semgrep"],
   "env": {
     "MAX_THINKING_TOKENS": "32000"
   }

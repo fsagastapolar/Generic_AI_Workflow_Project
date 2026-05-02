@@ -11,7 +11,7 @@ Browser automation for testing uses the **agent-browser** CLI (not Playwright). 
 **Important**: Never commit files containing API keys, tokens, or other sensitive credentials to version control.
 
 The following files are excluded from Git via `.gitignore`:
-- `.claude/mcp_config.json`
+- `.claude/mcp_config.json`9
 - `.claude/mcp_config_merged.json`
 - `.claude/settings.local.json`
 - `.env`

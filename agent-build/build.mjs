@@ -260,30 +260,68 @@ function warningHeader(canonicalDir) {
 `;
 }
 
+const SKILL_EXCLUDE = new Set(['.git', 'node_modules', '.DS_Store']);
+
+function copyDirRecursive(srcAbs, destAbs) {
+  if (!fs.existsSync(srcAbs)) return;
+  ensureDir(destAbs);
+  for (const entry of fs.readdirSync(srcAbs)) {
+    if (SKILL_EXCLUDE.has(entry)) continue;
+    const srcEntry = path.join(srcAbs, entry);
+    const destEntry = path.join(destAbs, entry);
+    const stat = fs.statSync(srcEntry);
+    if (stat.isDirectory()) {
+      copyDirRecursive(srcEntry, destEntry);
+    } else {
+      const content = fs.readFileSync(srcEntry);
+      const existing = fs.existsSync(destEntry) ? fs.readFileSync(destEntry) : null;
+      if (!existing || !Buffer.equals(existing, content)) {
+        fs.writeFileSync(destEntry, content);
+        writes++;
+        const rel = path.relative(ROOT, destEntry);
+        if (VERBOSE) console.log(`  write ${rel}`);
+      } else {
+        if (VERBOSE) console.log(`  ok    ${path.relative(ROOT, destEntry)}`);
+      }
+    }
+  }
+}
+
+function rmDirRecursive(absDir) {
+  if (!fs.existsSync(absDir)) return;
+  fs.rmSync(absDir, { recursive: true, force: true });
+}
+
+function buildSkills() {
+  const skillNames = manifest.skills || [];
+  if (!Array.isArray(skillNames) || skillNames.length === 0) {
+    if (VERBOSE) console.log('  no skills in manifest, skipping');
+    return;
+  }
+
+  const outputDir = path.join(ROOT, TARGETS.skills.opencodeDir);
+  rmDirRecursive(outputDir);
+
+  for (const skillName of skillNames) {
+    const srcDir = path.join(ROOT, TARGETS.skills.canonicalDir, skillName);
+    if (!fs.existsSync(srcDir)) {
+      console.warn(`! warning: skill "${skillName}" listed in manifest but not found in ${TARGETS.skills.canonicalDir}/`);
+      continue;
+    }
+    expectedSkillDirs.add(skillName);
+    copyDirRecursive(srcDir, path.join(outputDir, skillName));
+  }
+}
+
+buildSkills();
+
 for (const [section, dirs] of Object.entries(TARGETS)) {
+  if (dirs.type === 'skill') continue;
   const entries = manifest[section] || {};
-  const isSkill = dirs.type === 'skill';
 
   for (const [canonicalName, spec] of Object.entries(entries)) {
     if (section === 'agents' && LINEAR_AGENTS.has(canonicalName) && !linearEnabled) {
       if (VERBOSE) console.log(`  skip  ${canonicalName} (Linear disabled in project.config.json)`);
-      continue;
-    }
-
-    if (isSkill) {
-      const canonicalPath = path.join(ROOT, dirs.canonicalDir, canonicalName, 'SKILL.md');
-      if (!fs.existsSync(canonicalPath)) {
-        console.error(`! missing canonical: ${dirs.canonicalDir}/${canonicalName}/SKILL.md`);
-        process.exitCode = 2;
-        continue;
-      }
-      const body = stripFrontmatter(fs.readFileSync(canonicalPath, 'utf8'));
-      const dirname = spec.opencode.dirname || canonicalName;
-      const fm = spec.opencode.frontmatter || {};
-      const out = (Object.keys(fm).length ? emitFrontmatter(fm) : '') + warningHeader(dirs.canonicalDir) + body;
-      const rel = path.join(dirs.opencodeDir, dirname, 'SKILL.md');
-      expectedSkillDirs.add(dirname);
-      writeOrCheck(rel, out);
       continue;
     }
 
@@ -297,7 +335,6 @@ for (const [section, dirs] of Object.entries(TARGETS)) {
 
     const hdr = warningHeader(dirs.canonicalDir);
 
-    // Claude (single variant per canonical, optional)
     if (spec.claude) {
       const filename = spec.claude.filename || `${canonicalName}.md`;
       const fm = spec.claude.frontmatter || {};
@@ -307,7 +344,6 @@ for (const [section, dirs] of Object.entries(TARGETS)) {
       writeOrCheck(rel, out);
     }
 
-    // OpenCode (array of variants, optional)
     if (Array.isArray(spec.opencode)) {
       for (const variant of spec.opencode) {
         const filename = variant.filename || `${canonicalName}.md`;

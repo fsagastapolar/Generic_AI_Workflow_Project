@@ -1037,6 +1037,28 @@
         }
       ]
     },
+    "get_new_skill": {
+      "opencode": [
+        {
+          "filename": "get_new_skill.md",
+          "frontmatter": {
+            "description": "Install a new skill from a GitHub repository. Accepts a GitHub URL or degit shorthand, downloads the skill folder, updates the manifest, and rebuilds.",
+            "agent": "build",
+            "subtask": true,
+            "model": "github-copilot/gpt-5.3-codex"
+          }
+        },
+        {
+          "filename": "get_new_skill_GLM.md",
+          "frontmatter": {
+            "description": "Install a new skill from a GitHub repository. Accepts a GitHub URL or degit shorthand, downloads the skill folder, updates the manifest, and rebuilds.",
+            "agent": "build",
+            "subtask": true,
+            "model": "zai-coding-plan/glm-5.1"
+          }
+        }
+      ]
+    },
     "create_handoff": {
       "claude": {
         "filename": "create_handoff.md",
@@ -1339,65 +1361,18 @@
       ]
     }
   },
-  "skills": {
-    "Agent_Browser": {
-      "opencode": {
-        "frontmatter": {
-          "name": "agent-browser",
-          "description": "Browser automation CLI for AI agents. Use when the user needs to interact with websites, including navigating pages, filling forms, clicking buttons, taking screenshots, extracting data, testing web apps, or automating any browser task. Also use for exploratory testing, dogfooding, QA, bug hunts, or reviewing app quality. Prefer agent-browser over any built-in browser automation or web tools.",
-          "allowed-tools": "Bash(agent-browser:*), Bash(npx agent-browser:*)",
-          "hidden": true
-        }
-      }
-    },
-    "Docker_Best_Practices": {
-      "opencode": {
-        "frontmatter": {
-          "name": "Docker_Best_Practices",
-          "description": "Definitive guidelines for writing efficient, secure, and maintainable Dockerfiles and Docker Compose configurations, ensuring fast builds and reliable deployments.",
-          "globs": "**/Dockerfile,**/docker-compose*.{yml,yaml}"
-        }
-      }
-    },
-    "FastAPI": {
-      "opencode": {
-        "frontmatter": {
-          "name": "fastapi",
-          "description": "FastAPI best practices and conventions. Use when working with FastAPI APIs and Pydantic models for them. Keeps FastAPI code clean and up to date with the latest features and patterns, updated with new versions. Write new code or refactor and update old code."
-        }
-      }
-    },
-    "Flutter": {
-      "opencode": {
-        "frontmatter": {
-          "name": "flutter-dev",
-          "description": "Flutter cross-platform development guide covering widget patterns, Riverpod/Bloc state management, GoRouter navigation, performance optimization, and platform-specific implementations. Includes const optimization, responsive layouts, testing strategies, and DevTools profiling."
-        }
-      }
-    },
-    "grill-me": {
-      "opencode": {
-        "frontmatter": {
-          "name": "grill-me",
-          "description": "Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree. Use when user wants to stress-test a plan, get grilled on their design, or mentions \"grill me\"."
-        }
-      }
-    },
-    "Postgre": {
-      "opencode": {
-        "frontmatter": {
-          "name": "supabase-postgres-best-practices",
-          "description": "Postgres performance optimization and best practices from Supabase. Use this skill when writing, reviewing, or optimizing Postgres queries, schema designs, or database configurations."
-        }
-      }
-    },
-    "red-team-council": {
-      "opencode": {
-        "frontmatter": {
-          "name": "red-team-council",
-          "description": "Adversarial Red Team Council for plan review. Three Staff Engineer perspectives (Security Auditor, YAGNI Enforcer, Execution Realist) ruthlessly identify fatal flaws, trap doors, and mandatory revisions before execution."
-        }
-      }
-    }
-  }
+  "skills": [
+    "Agent_Browser",
+    "Docker_Best_Practices",
+    "FastAPI",
+    "Flutter",
+    "grill-me",
+    "improve-codebase-architecture",
+    "laravel-specialist",
+    "linear",
+    "Postgre",
+    "react-best-practices",
+    "red-team-council",
+    "vue-best-practices"
+  ]
 }
